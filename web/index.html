@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Openwords</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="js/jquery-2.1.1.min.js"></script>
+        <script src="ng-file-upload/angular-file-upload-shim.min.js"></script> 
+        <script src="ng/angular.min.js"></script>
+        <script>
+            angular.module("RootPage", ["angularFileUpload"]);
+        </script>
+        <script src="ng/control_root.js"></script>
+        <script src="ng/control_uploads.js"></script>
+        <script src="ng/control_uploads_pinyin.js"></script>
+        <script src="bootstrap-3.1.1/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="bootstrap-3.1.1/css/bootstrap.min.css" type="text/css">
+        <script src="ng-file-upload/angular-file-upload.min.js"></script>
+        <style>
+            .simple-bold{
+                font-weight: bold;
+            }
+
+            .bigger-bold{
+                font-size: 18px; 
+                font-weight: bold;
+            }
+
+            .api-title{
+                font-size: 18px;
+                margin-top: 50px;
+            }
+
+            .pop-rank{
+                width:24px; 
+                height:24px;
+                margin-left: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <div ng-app="RootPage" ng-controller="RootControl"style="margin-top: 50px;">
+            <div class="row" style="width: 100%;">
+                <div class="col-xs-1 col-md-3"></div>
+                <div class="col-xs-10 col-md-6">
+
+                    <ul class="nav nav-pills">
+                        <li><a href="#anchor_over" style="text-align: center;">Openwords Overview</a></li>
+                        <li><a href="#anchor_apis" style="text-align: center;">Public API</a></li>
+                    </ul>
+                    <hr/>
+
+                    <div class="panel panel-info">
+                        <div class="panel-body">
+                            <span style="font-family: Californian FB;">
+                                <br/>
+                                <br/>
+                                <img style="width: 417px; height: 97px;" alt="image did not load, try refreshing page" src="img/openwords_logo_c_oranged_h_97.png"/><br>
+                                <br/>
+                            </span>
+                            <span>
+                                This is the HTTP API of Openwords services. This means that the text of an url (that you place in the address bar of a browser) performs a remote query of the Openwords db, and returns the data in the simple 'JSON' format within your browser. The parameters of the query are within the text of the url. The below <a href="#anchor_apis" style="text-align: center;">descriptions</a> illustrate five different kinds of queries (with examples).
+                            </span>
+                            <br/><br/>
+                            <span>
+                                The Openwords db has the following structure. There is a large table of words ('words') from many languages. Next there are many connections between these words represented by the wordsConnections table. Both the 'words' and 'wordsConnections' tables have additional information attached to them. A more complete description of the Openwords database will be forthcoming.
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-xs-1 col-md-3"></div>
+            </div>
+            <br/><br/><br/>
+            <div class="row" style="width: 100%;">
+                <div class="col-xs-1 col-md-3"></div>
+                <div class="col-xs-10 col-md-6">
+                    <div class="panel panel-info">
+                        <div class="panel-body">
+                            <a name="anchor_over"></a>
+                            <span>Openwords currently hold <span class="bigger-bold">{{langList.length}}</span> languages, <span class="bigger-bold">{{totalWords| number}}</span> words, and <span class="bigger-bold">{{totalSounds| number}}</span> sounds:</span>
+                            <div style="margin-top: 10px; margin-left: 20px;">
+                                <p ng-repeat="lang in langList"><span class="simple-bold">{{lang[0]}} ({{lang[2]}}, langId={{lang[3]}})</span> with <span class="simple-bold">{{lang[1]| number}}</span> words and <span class="simple-bold">{{lang[4]| number}}</span> sounds</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-1 col-md-3"></div>
+            </div>
+            <br/><br/><br/>
+            <div class="row" style="width: 100%;">
+                <div class="col-xs-1 col-md-3"></div>
+                <div class="col-xs-10 col-md-6">
+                    <div class="panel panel-info">
+                        <div class="panel-body">
+                            <a name="anchor_apis"></a>
+                            <p style="text-align: center;">Available Public APIs:</p>
+
+                            <p class="api-title"><span class="label label-success">/overviewOpenwords</span></p>
+                            <p>Overview the entire languages information.</p>
+                            <span>Example: </span>
+                            <a href="overviewOpenwords" target="_blank">/overviewOpenwords</a>
+
+                            <p class="api-title"><span class="label label-success">/simpleTranslate</span></p>
+                            <p>Translate a simple word from one language to another.</p>
+                            <table class="table table-hover table-bordered">
+                                <thead>
+                                    <tr><th>Parameter</th><th>Constraints</th><th>Purpose</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>word</td><td>String, compulsory</td><td>The word to be translated</td></tr>
+                                    <tr><td>langIn</td><td>String, compulsory</td><td>Language code of input language</td></tr>
+                                    <tr><td>langOut</td><td>String, compulsory</td><td>Language code of output language</td></tr>
+                                </tbody>
+                            </table>
+                            <span>Example: </span>
+                            <a href="simpleTranslate?word=自由&langIn=cmn&langOut=en" target="_blank">/simpleTranslate?word=自由&AMP;langIn=cmn&AMP;langOut=en</a>
+
+                            <p class="api-title"><span class="label label-success">/getWordInfo</span></p>
+                            <p>Get all (first 10 for now) the words which look like the requesting word.</p>
+                            <table class="table table-hover table-bordered">
+                                <thead>
+                                    <tr><th>Parameter</th><th>Constraints</th><th>Purpose</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>wordForm</td><td>String, compulsory</td><td>The complete or partial spelling of the word</td></tr>
+                                </tbody>
+                            </table>
+                            <span>Example: </span>
+                            <a href="getWordInfo?wordForm=dict" target="_blank">/getWordInfo?wordForm=dict</a>
+
+                            <p class="api-title"><span class="label label-success">/getWordAllConnections</span><img alt="" src="img/quality.png" class="pop-rank"/></p>
+                            <p>Get all other words which are connected to the word.</p>
+                            <table class="table table-hover table-bordered">
+                                <thead>
+                                    <tr><th>Parameter</th><th>Constraints</th><th>Purpose</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>wordOne</td><td>String, compulsory</td><td>The complete spelling of the word</td></tr>
+                                </tbody>
+                            </table>
+                            <span>Example: </span>
+                            <a href="getWordAllConnections?wordOne=love" target="_blank">/getWordAllConnections?wordOne=love</a>
+
+                            <p class="api-title"><span class="label label-success">/getLanguageConnections</span></p>
+                            <p>Get all connected words between two langauges.</p>
+                            <table class="table table-hover table-bordered">
+                                <thead>
+                                    <tr><th>Parameter</th><th>Constraints</th><th>Purpose</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>langOneId</td><td>Integer, compulsory</td><td>ID of language one</td></tr>
+                                    <tr><td>langTwoId</td><td>Integer, compulsory</td><td>ID of language two</td></tr>
+                                    <tr><td>pageNumber</td><td>Integer, compulsory</td><td>The page number needed</td></tr>
+                                    <tr><td>pageSize</td><td>Integer, compulsory</td><td>Size of each page</td></tr>
+                                    <tr><td>doOrder</td><td>Boolean, optional</td><td>Whether order the results</td></tr>
+                                    <tr><td>orderBy</td><td>String, optional</td><td>Ordering criteria, such as "popRank"</td></tr>
+                                </tbody>
+                            </table>
+                            <span>Example: </span>
+                            <a href="getLanguageConnections?langOneId=1&langTwoId=98&pageNumber=1&pageSize=5&doOrder=true&orderBy=popRank" target="_blank">/getLanguageConnections?langOneId=1&AMP;langTwoId=98&AMP;pageNumber=1&AMP;pageSize=5&AMP;doOrder=true&AMP;orderBy=popRank</a>
+
+                            <p class="api-title"><span class="label label-success">Download the words evaluation file in ODS format</span></p>
+                            <p>Get all the word connections between English and your chosen language, and then contribute your evaluation input!</p>
+                            <table class="table table-hover table-bordered">
+                                <thead>
+                                    <tr><th>Parameter</th><th>Constraints</th><th>Purpose</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>langTwoId</td><td>Integer, compulsory</td><td>ID of language two</td></tr>
+                                    <tr><td>pass</td><td>String, optional</td><td>Password for our permitted participants</td></tr>
+                                </tbody>
+                            </table>
+                            <span>Check above language info list and input one language ID at here:</span>
+                            <br/>
+                            <input type="number" ng-model="langTwoId"/>
+                            <br/>
+                            <span>And then type the password at here:</span>
+                            <br/>
+                            <input type="text" ng-model="password"/>
+                            <br/>
+                            <br/>
+                            <a href="javascript:void(0);" ng-show="showDownload" ng-click="doDownload()">Click here to download</a>
+
+                            <p class="api-title"><span class="label label-success">/translateDocument</span></p>
+                            <p>Translate a document of words from one language to another. This service will return an url for the translated document upon success.</p>
+                            <table class="table table-hover table-bordered">
+                                <thead>
+                                    <tr><th>Parameter</th><th>Constraints</th><th>Purpose</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>file</td><td>Binary, compulsory</td><td>The file object of the document</td></tr>
+                                    <tr><td>langIn</td><td>String, compulsory</td><td>ID of language one</td></tr>
+                                    <tr><td>langOut</td><td>String, compulsory</td><td>ID of language two</td></tr>
+                                    <tr><td>place</td><td>String, optional</td><td>Placeholder for the words which cannot be translated, if this parameter is not specified then original language one words will be kept in the same place</td></tr>
+                                </tbody>
+                            </table>
+                            <div class="panel panel-success" ng-controller="FileUploadControl">
+                                <div class="panel-body">
+                                    <div>
+                                        <label>Language In</label>
+                                        <div>
+                                            <input type="text" ng-model="langIn" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label>Language Out</label>
+                                        <div>
+                                            <input type="text" ng-model="langOut"/>
+                                        </div>
+                                    </div>
+                                    <div style="margin-bottom: 30px;">
+                                        <label>Placeholder</label>
+                                        <div>
+                                            <input type="text" ng-model="place"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="alert alert-danger drop-area" ng-file-drop="onFileSelect($files)" ng-file-drag-over-class="alert-success"
+                                         ng-show="dropSupported">You can drop your .txt file here (Please use UTF-8 encoding, max file size: 2MB)</div>
+
+                                    <div ng-file-drop-available="dropSupported=true" 
+                                         ng-show="!dropSupported">HTML5 Drop File is not supported!</div>
+
+                                    <progressbar ng-show="started" class="progress-striped active" value="percentage" type="{{progressType}}"><b>{{progressText}}</b></progressbar>
+                                    <br/>
+                                    <button class="btn btn-danger" ng-show="started" ng-click="upload.abort()">Abort Uploading</button>
+                                    <br/>
+                                    <button class="btn btn-success" ng-show="showDownloadFile" ng-click="downloadFile()">Download translated file</button>
+                                </div>
+                            </div>
+
+                            <hr/>
+                            <div ng-controller="TranscriptionUploadControl">
+                                <div class="alert alert-danger drop-area" ng-file-drop="onFileSelect($files)" ng-file-drag-over-class="alert-success"
+                                     ng-show="dropSupported">You can drop your transcription.txt file here (Please use UTF-8 encoding, max file size: 800KB)</div>
+
+                                <div ng-file-drop-available="dropSupported=true" 
+                                     ng-show="!dropSupported">HTML5 Drop File is not supported!</div>
+
+                                <progressbar ng-show="started" class="progress-striped active" value="percentage" type="{{progressType}}"><b>{{progressText}}</b></progressbar>
+                            </div>
+
+                            <p style="margin-top: 80px; font-size: 20px;">And more later on...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-1 col-md-3"></div>
+            </div>
+        </div>
+    </body>
+</html>

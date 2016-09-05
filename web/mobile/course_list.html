@@ -1,0 +1,23 @@
+<div class="page-content with-subnavbar">
+    <div class="content-block">
+        <div class="list-block cards-list">
+            <ul>
+                <li class="card demo-card-header-pic" ng-repeat="c in rootAllCourse.list" ng-click="learnCourse(c)">
+                    <div data-background="{{c.fileCover}}"
+                         valign="bottom" 
+                         class="card-header color-white no-border lazy lazy-fadeIn">{{c.name}}</div>
+                    <div class="card-content">
+                        <div class="card-content-inner">
+                            <p class="color-gray">Posted on {{c.makeTime| date:"MMMM d, yyyy"}}</p>
+                            <p>{{c.json.comment}}</p>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="link">Learn</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,13 @@
+.demo-card-header-pic .card-header {
+    height: 30vw;
+    background-size: cover;
+    background-position: center;
+}
+
+.lesson-done{
+    background-color: #dddddd;
+}
+
+.incorrect-choice{
+    text-decoration: underline;
+}

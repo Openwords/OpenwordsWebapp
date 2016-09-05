@@ -1,0 +1,87 @@
+<div class="swiper-slide" id="step_page_id" ng-controller="StepPageControl" ng-init="init()">
+    <div style="height: 50%; overflow-y: auto; padding: 20px;" ng-if="!step.final">
+        <div ng-repeat="line in step.lines" style="margin-bottom: 10px;
+             display: flex;
+             align-items: center;
+             flex-wrap: wrap;">
+            <span ng-repeat="item in line" style="font-size: 0px;">
+                <span ng-if="item.type === 'pro'" 
+                      ng-repeat="t in item.text" 
+                      style="font-size: 16pt; display: inline-block;">
+                    {{t}}
+                </span>
+                <a href="#"
+                   ng-if="item.type === 'ans' && !item.userInput" class="button color-green"
+                   style="display: inline-block; font-size: 16pt;">
+                    <span ng-if="mode === 'exam'">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <span ng-if="mode === 'preview'">{{item.text[0]}}</span>
+                </a>
+                <a href="#"
+                   ng-if="item.userInput" 
+                   ng-class="{'color-green': !studyState.reachFinal || item.ok,
+                              'color-red': (studyState.reachFinal && !item.ok) || (lesson.imf && !item.ok),
+                              'incorrect-choice': (studyState.reachFinal && !item.ok) || (lesson.imf && !item.ok)}"
+                   style="display: inline-block; font-size: 16pt;"
+                   ng-click="removeInput(item)">
+                    <span>{{item.userInput}}</span>
+                </a>
+            </span>
+        </div>
+    </div>
+    <div class="content-block inset" style="height: 50%; overflow-y: auto;" ng-if="!step.final">
+        <div class="content-block-inner" ng-if="mode === 'preview'">
+            <a href="#" ng-repeat="a in answerPool" 
+               style="display: inline-block; white-space: normal; margin-right: 10px; font-size: 16pt;  margin-bottom: 5px;"
+               class="button button-fill"
+               ng-class="{'color-green': a.type === 'ans','color-red': a.type === 'mar'}">
+                {{a.text}}
+            </a>
+        </div>
+        <div class="content-block-inner" ng-if="(mode === 'exam' && !lesson.imf) || (mode === 'exam' && !step.check && lesson.imf)">
+            <a href="#" ng-repeat="a in answerPool" 
+               style="display: inline-block; white-space: normal; margin-right: 10px; font-size: 16pt;  margin-bottom: 5px;"
+               class="button button-fill color-green"
+               ng-click="pickAnswer(a)">
+                {{a.text}}
+            </a>
+        </div>
+        <div class="content-block-inner" 
+             style="text-align: center;"
+             ng-if="mode === 'exam' && step.check && lesson.imf">
+            <span class="color-green" style="font-size: 36pt;">&#x2713;</span>
+        </div>
+    </div>
+    <div ng-if="step.final">
+        <div class="content-block-title">Lesson Result</div>
+        <div class="content-block">
+            <div class="content-block-inner" style="font-size: 26pt;">
+                <a href="#" ng-repeat="s in steps" ng-if="!$last"
+                   style="margin-right: 30px;"
+                   ng-click="slideTo($index)">
+                    <span ng-if="s.check" class="color-green">&#x2713;</span>
+                    <span ng-if="!s.check" class="color-red">&#x2717;</span>
+                </a>
+            </div>
+        </div>
+        <div class="content-block-title">Comment</div>
+        <div class="list-block">
+            <ul>
+                <li class="align-top">
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-input">
+                                <textarea ng-model="lessonComment.text" 
+                                          placeholder="It will be great if you have any comment to this lesson!"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="content-block row">
+            <div class="col-20"></div>
+            <a href="#" class="button button-fill" ng-click="sendComment()" ng-disabled="lessonComment.done">Submit Comment</a>
+            <div class="col-20"></div>
+        </div>
+    </div>
+</div>

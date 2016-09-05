@@ -1,0 +1,52 @@
+<div class="page-content">
+    <div class="list-block inset">
+        <ul>
+            <li>
+                <div class="item-content">
+                    <div class="item-media"><i class="icon icon-form-name"></i></div>
+                    <div class="item-inner">
+                        <div class="item-input">
+                            <input type="text" placeholder="Your user name" ng-model="regInfo.username">
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="item-content">
+                    <div class="item-media"><i class="icon icon-form-password"></i></div>
+                    <div class="item-inner">
+                        <div class="item-input">
+                            <input type="password" placeholder="Password" ng-model="regInfo.pass">
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="item-content">
+                    <div class="item-media"><i class="icon icon-form-password"></i></div>
+                    <div class="item-inner">
+                        <div class="item-input">
+                            <input type="password" placeholder="Retype Password" ng-model="regInfo.repass">
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="item-content">
+                    <div class="item-media"><i class="icon icon-form-email"></i></div>
+                    <div class="item-inner">
+                        <div class="item-input">
+                            <input type="email" placeholder="E-mail" ng-model="regInfo.email">
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+        </ul>
+    </div>
+    <div class="content-block row">
+        <div class="col-20"></div>
+        <a href="#" class="button" ng-click="doReg()" ng-disabled="!canSubmit()">Submit</a>
+        <div class="col-20"></div>
+    </div>
+</div>

@@ -1,0 +1,40 @@
+<div class="page-content">
+    <div class="card demo-card-header-pic" style="margin: 0px;">
+        <div style="background-image:url(img/test6.jpg)" valign="bottom" class="card-header color-white no-border">
+            {{course.name}}
+        </div>
+        <div class="card-content">
+            <div class="card-content-inner">
+                <p>{{course.json.comment}}</p>
+            </div>
+        </div>
+    </div>
+    <div class="list-block cards-list">
+        <ul>
+            <li class="card" ng-repeat-start="les in course.json.lessons"
+                style="width: 100%; margin: 0px;">
+                <a href="#" ng-click="learnLesson(les)">
+                    <div class="card-content">
+                        <div class="card-content-inner" ng-class="{'lesson-done': les.ok}">
+                            <p>
+                                <span style="margin-right: 20px; vertical-align: middle;">
+                                    <span>{{$index + 1}}</span>
+                                </span>
+                                <span style="vertical-align: middle;">{{les.name}}</span>
+                                <span ng-if="les.imf" class="badge" style="margin-left: 5px;">I</span>
+                                <span ng-if="!les.imf" class="badge" style="margin-left: 5px;">E</span>
+                                <span ng-if="les.ok" style="float: right; font-size: 16pt; vertical-align: middle;">&#x2713;</span>
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            </li>
+            <li ng-repeat-end>
+                <div style="width: 3px; height: 40px; background-color: #007aff; margin-left: 20px;">
+                    &nbsp;
+                </div>
+            </li>
+        </ul>
+        <a href="#" class="color-red" ng-click="forfeitCourse()">Forfeit</a>
+    </div>
+</div>

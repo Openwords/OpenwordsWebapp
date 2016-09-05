@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- Required meta tags-->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <!-- Your app title -->
+        <title>Openwords</title>
+        <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+        <link rel="icon" href="favicon.ico" type="image/x-icon">
+        <!-- Path to Framework7 iOS CSS theme styles-->
+        <link rel="stylesheet" href="libs/Framework7/dist/css/framework7.ios.min.css">
+        <!-- Path to Framework7 iOS related color styles -->
+        <link rel="stylesheet" href="libs/Framework7/dist/css/framework7.ios.colors.min.css">
+
+        <link rel="stylesheet" href="my-css.css">
+        <link rel="stylesheet" href="libs/toast/toast.css">
+        <script type="text/javascript" src="libs/angular.min.1.5.6.js"></script>
+        <script type="text/javascript" src="libs/angular-file-upload.min.js"></script>
+        <script type="text/javascript" src="libs/shuffle-array.min.js"></script>
+        <script type="text/javascript" src="libs/toast/toast.js"></script>
+        <script type="text/javascript" src="libs/string.min.js"></script>
+    </head>
+    <body ng-app="OpenwordsApp" ng-controller="RootControl" id="RootControl">
+        <!-- Status bar overlay for full screen mode (PhoneGap) -->
+        <div class="statusbar-overlay"></div>
+        <!-- Panels overlay-->
+        <div class="panel-overlay"></div>
+        <!-- Left panel with reveal effect-->
+        <div class="panel panel-right panel-reveal">
+            <div class="content-block">
+                <a href="#" class="close-panel" ng-click="logOut()">Log Out</a>
+            </div>
+            <div class="content-block">
+                <a href="#lesson_manager" class="close-panel">Manage Your Lessons</a>
+            </div>
+            <div class="content-block">
+                <a href="#course_manager" class="close-panel">Manage Your Courses</a>
+            </div>
+            <div class="content-block">
+                <a href="#" class="close-panel" ng-click="goToCourseStudy()">Progress</a>
+            </div>
+        </div>
+        <!-- Views -->
+        <div class="views">
+            <!-- Your main view, should have "view-main" class -->
+            <div class="view view-main">
+                <!-- Top Navbar-->
+                <div class="navbar">
+                    <div class="navbar-inner" data-page="index">
+                        <!-- We need cool sliding animation on title element, so we have additional "sliding" class -->
+                        <div class="center sliding">Openwords (Alpha)</div>
+                    </div>
+
+                    <div class="navbar-inner cached" data-page="course_list">
+                        <div class="center">Openwords</div>
+                        <div class="right">
+                            <!-- 
+                              Right link contains only icon - additional "icon-only" class
+                              Additional "open-panel" class tells app to open panel when we click on this link
+                            -->
+                            <a href="#" class="link icon-only open-panel"><i class="icon icon-bars"></i></a>
+                        </div>
+
+                        <div class="subnavbar">
+                            <div class="buttons-row">
+                                <a href="#course_list" class="button active" ng-click="refreshCourseList()">Courses</a>
+                                <!--                                <a href="#words" class="button">Words</a>-->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="navbar-inner cached" data-page="words">
+                        <div class="center">Openwords - Learn from Words</div>
+                        <div class="right">
+                            <a href="#" class="link icon-only open-panel"><i class="icon icon-bars"></i></a>
+                        </div>
+
+                        <div class="subnavbar">
+                            <div class="buttons-row">
+                                <a href="#course_list" class="button">Courses</a>
+                                <a href="#words" class="button active">Words</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="navbar-inner cached" data-page="steps">
+                        <div class="left">
+                            <a href="#" class="link" id="back_button_in_steps"><i class="icon icon-back"></i><span>Back to Lessons</span></a>
+                        </div>
+                    </div>
+
+                    <div class="navbar-inner cached" data-page="course_progress">
+                        <div class="left">
+                            <a href="#course_list" class="link"><i class="icon icon-back"></i><span>Back to Courses</span></a>
+                        </div>
+                    </div>
+
+                    <div class="navbar-inner cached" data-page="course_manager">
+                        <div class="left">
+                            <a href="#course_list" class="link icon-only"><i class="icon icon-back"></i></a>
+                        </div>
+                        <div class="center">Manage Course</div>
+                    </div>
+
+                    <div class="navbar-inner cached" data-page="lesson_manager">
+                        <div class="left">
+                            <a href="#course_list" class="link icon-only"><i class="icon icon-back"></i></a>
+                        </div>
+                        <div class="center">Manage Lesson</div>
+                    </div>
+
+                    <div class="navbar-inner cached" data-page="course_edit">
+                        <div class="left">
+                            <a href="#" class="link icon-only" ng-click="backFromCourseEdit()"><i class="icon icon-back"></i></a>
+                        </div>
+                        <div class="center">Edit Course</div>
+                        <div class="right">
+                            <a href="#" class="link" ng-click="saveCourse()">Save</a>
+                        </div>
+                    </div>
+
+                    <div class="navbar-inner cached" data-page="course_study">
+                        <div class="left">
+                            <a href="#course_list" class="link icon-only"><i class="icon icon-back"></i></a>
+                        </div>
+                        <div class="center">Progress</div>
+                    </div>
+
+                    <div class="navbar-inner cached" data-page="registration">
+                        <div class="left">
+                            <a href="#index" class="link icon-only"><i class="icon icon-back"></i></a>
+                        </div>
+                        <div class="center">Create Account</div>
+                    </div>
+                </div>
+
+                <div class="pages">
+                    <!-- Page, "data-page" contains page name -->
+                    <div data-page="index" class="page navbar-fixed" ng-controller="LoginControl" ng-include="'login.html'">                        
+                    </div>
+
+                    <div data-page="course_list" class="page cached navbar-fixed" 
+                         ng-controller="CourseListControl" 
+                         ng-include="'course_list.html'"
+                         id="CourseListControl">
+                    </div>
+
+                    <div data-page="words" class="page cached navbar-fixed">
+                        <div class="page-content with-subnavbar">
+                            <div class="content-block">
+                                <p>Coming soon...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div data-page="steps" class="page cached navbar-fixed"
+                         ng-controller="StepsControl" 
+                         ng-include="'steps.html'"
+                         id="StepsControl">
+                    </div>
+
+                    <div data-page="course_progress" class="page cached navbar-fixed" 
+                         ng-controller="CourseProgressControl" 
+                         ng-include="'course_progress.html'" 
+                         id="CourseProgressControl">
+                    </div>
+
+                    <div data-page="course_manager" class="page cached navbar-fixed"
+                         ng-controller="CourseManagerControl"
+                         ng-include="'course_manager.html'" 
+                         id="CourseManagerControl">
+                    </div>
+
+                    <div data-page="lesson_manager" class="page cached navbar-fixed"
+                         ng-controller="LessonManagerControl"
+                         ng-include="'lesson_manager.html'" 
+                         id="LessonManagerControl">
+                    </div>
+
+                    <div data-page="course_edit" class="page cached navbar-fixed"
+                         ng-controller="CourseEditControl"
+                         ng-include="'course_edit.html'" 
+                         id="CourseEditControl">
+                    </div>
+
+                    <div data-page="course_study" class="page cached navbar-fixed"
+                         ng-controller="CourseStudyControl"
+                         ng-include="'course_study.html'" 
+                         id="CourseStudyControl">
+                    </div>
+
+                    <div data-page="registration" class="page cached navbar-fixed"
+                         ng-controller="RegistrationControl"
+                         ng-include="'registration.html'" 
+                         id="RegistrationControl">
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="popup popup-choose-lesson"
+             ng-include="'popup_lesson.html'">
+        </div>
+        <!-- Path to Framework7 Library JS-->
+        <script type="text/javascript" src="libs/Framework7/dist/js/framework7.min.js"></script>
+        <!-- Path to your app js-->
+        <script type="text/javascript" src="my-app.js"></script>
+        <script type="text/javascript" src="ng/util_list.js"></script>
+        <script type="text/javascript" src="ng/control_root.js"></script>
+        <script type="text/javascript" src="ng/control_login.js"></script>
+        <script type="text/javascript" src="ng/control_course_list.js"></script>
+        <script type="text/javascript" src="ng/control_steps.js"></script>
+        <script type="text/javascript" src="ng/control_course_progress.js"></script>
+        <script type="text/javascript" src="ng/control_course_manager.js"></script>
+        <script type="text/javascript" src="ng/control_lesson_manager.js"></script>
+        <script type="text/javascript" src="ng/control_course_edit.js"></script>
+        <script type="text/javascript" src="ng/control_course_study.js"></script>
+        <script type="text/javascript" src="ng/control_registration.js"></script>
+    </body>
+</html>              
