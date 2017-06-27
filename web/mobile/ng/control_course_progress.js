@@ -1,31 +1,53 @@
-myNg.controller("CourseProgressControl", function($scope, $http) {
-    $scope.setCourse = function(c, local) {
-        if (local) {
-            $scope.course = c;
-        } else {
-            $scope.course = null;
-            myApp.showPreloader("Checking progress...");
+myNg.controller("CourseProgressControl", function ($scope, $http) {
+    $scope.setCourse = function (c) {
+        $scope.canSync = false;
+        $scope.course = null;
+        myApp.showPreloader("Checking progress...");
+        $http({
+            url: "copyCourse",
+            method: "get",
+            params: {
+                makeTime: c.makeTime,
+                authorId: c.authorId
+            }
+        }).then(function (res) {
+            myApp.hidePreloader();
+            var r = res.data;
+            if (r.errorMessage) {
+                myApp.alert(null, "Cannot load course");
+                return;
+            }
+            $scope.course = r.result;
+            $scope.canSync = r.canSync;
+        });
+    };
+
+    $scope.syncCourse = function () {
+        myApp.confirm("You can sync this course to the newest version that the course author has made. But please note that this will erase the entire progress of this course you made so far, want to continue?", "Syncing Course", function () {
+            myApp.showPreloader("Syncing course...");
             $http({
-                url: "copyCourse",
+                url: "syncCourse",
                 method: "get",
                 params: {
-                    makeTime: c.makeTime,
-                    userId: userInfo.userId,
-                    authorId: c.authorId
+                    makeTime: $scope.course.makeTime,
+                    authorId: $scope.course.authorId
                 }
-            }).then(function(res) {
+            }).then(function (res) {
                 myApp.hidePreloader();
                 var r = res.data;
                 if (r.errorMessage) {
-                    myApp.alert(null, "Cannot load course");
+                    myApp.alert(null, "Cannot sync course");
                     return;
                 }
-                $scope.course = r.result;
+                $scope.course.json = r.result.json;
+                $scope.course.updated = r.result.updated;
+                $scope.canSync = false;
             });
-        }
+        });
     };
 
-    $scope.learnLesson = function(les) {
+    $scope.learnLesson = function (les) {
+        stepRe = true;
         STEPS = les.json.steps;
         if (!STEPS[STEPS.length - 1].final) {
             STEPS.push({final: true});
@@ -35,7 +57,7 @@ myNg.controller("CourseProgressControl", function($scope, $http) {
         StepsControl.lesson = les;
         StepsControl.mode = "exam";
         StepsControl.studyState.reachFinal = false;
-        $$("#back_button_in_steps").once("click", function() {
+        $$("#back_button_in_steps").once("click", function () {
             stepOn = false;
             mainView.router.load({pageName: "course_progress"});
         });
@@ -43,20 +65,18 @@ myNg.controller("CourseProgressControl", function($scope, $http) {
         stepOn = true;
     };
 
-    $scope.forfeitCourse = function() {
+    $scope.forfeitCourse = function () {
         myApp.confirm("Are you sure to forfeit this course? Study progress will be discarded.",
                 "Forfeit Course",
-                function() {
+                function () {
                     $http({
                         url: "deleteCourse",
                         method: "get",
                         params: {
-                            pass: "",
                             makeTime: $scope.course.makeTime,
-                            userId: $scope.course.userId,
                             authorId: $scope.course.authorId
                         }
-                    }).then(function(res) {
+                    }).then(function (res) {
                         var r = res.data;
                         if (!r.errorMessage) {
                             myApp.alert(null, "Course progress deleted");
@@ -68,3 +88,5 @@ myNg.controller("CourseProgressControl", function($scope, $http) {
         );
     };
 });
+
+

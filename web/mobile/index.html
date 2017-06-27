@@ -16,12 +16,8 @@
         <link rel="stylesheet" href="libs/Framework7/dist/css/framework7.ios.colors.min.css">
 
         <link rel="stylesheet" href="my-css.css">
-        <link rel="stylesheet" href="libs/toast/toast.css">
-        <script type="text/javascript" src="libs/angular.min.1.5.6.js"></script>
-        <script type="text/javascript" src="libs/angular-file-upload.min.js"></script>
-        <script type="text/javascript" src="libs/shuffle-array.min.js"></script>
-        <script type="text/javascript" src="libs/toast/toast.js"></script>
-        <script type="text/javascript" src="libs/string.min.js"></script>
+        <script type="text/javascript" src="libs/dist/angular.min.1.5.6.js"></script>
+        <script type="text/javascript" src="libs/dist/libs.js"></script>
     </head>
     <body ng-app="OpenwordsApp" ng-controller="RootControl" id="RootControl">
         <!-- Status bar overlay for full screen mode (PhoneGap) -->
@@ -135,6 +131,12 @@
                         </div>
                         <div class="center">Create Account</div>
                     </div>
+
+                    <div class="navbar-inner cached" data-page="sound_manager">
+                        <div class="left">
+                            <a href="#steps" class="link icon-only"><i class="icon icon-back"></i><span>Back</span></a>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="pages">
@@ -198,6 +200,12 @@
                          id="RegistrationControl">
                     </div>
 
+                    <div data-page="sound_manager" class="page cached navbar-fixed"
+                         ng-controller="SoundManagerControl"
+                         ng-include="'sound_manager.html'" 
+                         id="SoundManagerControl">
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -208,7 +216,7 @@
         <script type="text/javascript" src="libs/Framework7/dist/js/framework7.min.js"></script>
         <!-- Path to your app js-->
         <script type="text/javascript" src="my-app.js"></script>
-        <script type="text/javascript" src="ng/util_list.js"></script>
+        <!--<script type="text/javascript" src="ng/util_list.js"></script>
         <script type="text/javascript" src="ng/control_root.js"></script>
         <script type="text/javascript" src="ng/control_login.js"></script>
         <script type="text/javascript" src="ng/control_course_list.js"></script>
@@ -219,5 +227,10 @@
         <script type="text/javascript" src="ng/control_course_edit.js"></script>
         <script type="text/javascript" src="ng/control_course_study.js"></script>
         <script type="text/javascript" src="ng/control_registration.js"></script>
+        <script type="text/javascript" src="ng/control_sound_manager.js"></script>-->
+
+
+
+        <script type="text/javascript" src="ng/dist/controls.js"></script>
     </body>
 </html>              

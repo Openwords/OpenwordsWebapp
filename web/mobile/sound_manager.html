@@ -1,0 +1,53 @@
+<div class="page-content">
+
+    <div class="content-block-title">Item Text</div>
+    <div class="content-block inset">
+        <div class="content-block-inner">{{rootSoundManager.item.text[0]}}</div>
+    </div>
+
+    <div class="content-block inset">
+        <div class="content-block-inner">
+            <canvas id="visualizer" style="width: 100%; height: 80px;"></canvas>
+
+            <div class="row" id="sound_controls">
+            </div>
+
+            <div class="row">
+                <div class="col-50">
+                    <a href="#" class="button button-fill color-green"
+                       ng-click="startRecording()"
+                       ng-if="ok && !recording">Record</a>
+                </div>
+                <div class="col-50">
+                    <a href="#" class="button button-fill color-red"
+                       ng-click="stopRecording(true)"
+                       ng-if="ok && recording">Stop</a>
+                    <a href="#" class="button button-fill color-blue"
+                       ng-click="uploadRecording()"
+                       ng-if="canUpload">Upload this sound</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="content-block-title">Your Sounds in Openwords</div>
+    <div class="list-block">
+        <ul>
+            <li ng-repeat="s in soundList.list">
+                <a href="#" class="item-link item-content" ng-click="pickSound(s, $index)">
+                    <div class="item-inner">
+                        <div class="item-title">{{s.text}}</div>
+                        <div class="item-after" ng-if="s.use">
+                            <span class="badge">Use</span>
+                        </div>
+                        <div class="item-after" ng-if="!s.use">
+                            <span>{{s.updated| date:"MMM d, HH:mm"}}</span>
+                        </div>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+</div>

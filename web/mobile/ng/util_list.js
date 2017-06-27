@@ -6,10 +6,11 @@ function listCourse(pack, http, done) {
         method: "get",
         params: {pageNumber: pack.page,
             pageSize: pack.pageSize,
-            userId: pack.userId,
             authorId: pack.authorId,
+            my: pack.my,
+            user: pack.user,
             all: pack.all}
-    }).then(function(res) {
+    }).then(function (res) {
         var r = res.data;
         if (r.errorMessage) {
             console.error(r.errorMessage);
@@ -28,7 +29,7 @@ function listCourse(pack, http, done) {
         pack.list = r.result;
 
         //test
-        pack.list.forEach(function(c) {
+        pack.list.forEach(function (c) {
             var i = Math.floor(Math.random() * 9) + 1;
             c.fileCover = "img/test" + i + ".jpg";
         });
@@ -46,9 +47,8 @@ function listLesson(pack, http) {
         url: "listLesson",
         method: "get",
         params: {pageNumber: pack.page,
-            pageSize: pack.pageSize,
-            userId: pack.userId}
-    }).then(function(res) {
+            pageSize: pack.pageSize}
+    }).then(function (res) {
         var r = res.data;
         if (r.errorMessage) {
             console.error(r.errorMessage);
@@ -65,5 +65,24 @@ function listLesson(pack, http) {
             r.result.pop();
         }
         pack.list = r.result;
+    });
+}
+
+function listSound(pack, http, error, done) {
+    http({
+        url: "listSound",
+        method: "get"
+    }).then(function (res) {
+        var r = res.data;
+        if (r.errorMessage) {
+            if (error) {
+                error(r.errorMessage);
+            }
+            return;
+        }
+        pack.list = r.result;
+        if (done) {
+            done(pack.list);
+        }
     });
 }

@@ -7,7 +7,9 @@
             <span ng-repeat="item in line" style="font-size: 0px;">
                 <span ng-if="item.type === 'pro'" 
                       ng-repeat="t in item.text" 
-                      style="font-size: 16pt; display: inline-block;">
+                      style="font-size: 16pt; display: inline-block;"
+                      ng-click="proSoundOut(item)"
+                      ng-class="{'pro-item-with-sound': hasProSoundOut(item)}">
                     {{t}}
                 </span>
                 <a href="#"
@@ -19,8 +21,8 @@
                 <a href="#"
                    ng-if="item.userInput" 
                    ng-class="{'color-green': !studyState.reachFinal || item.ok,
-                              'color-red': (studyState.reachFinal && !item.ok) || (lesson.imf && !item.ok),
-                              'incorrect-choice': (studyState.reachFinal && !item.ok) || (lesson.imf && !item.ok)}"
+                   'color-red': (studyState.reachFinal && !item.ok) || (lesson.imf && !item.ok),
+                   'incorrect-choice': (studyState.reachFinal && !item.ok) || (lesson.imf && !item.ok)}"
                    style="display: inline-block; font-size: 16pt;"
                    ng-click="removeInput(item)">
                     <span>{{item.userInput}}</span>

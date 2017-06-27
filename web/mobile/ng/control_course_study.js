@@ -1,26 +1,18 @@
-myNg.controller("CourseStudyControl", function($scope, $http) {
+myNg.controller("CourseStudyControl", function ($scope, $http) {
 
-    $scope.listMyStudy = function(page) {
+    $scope.listMyStudy = function (page) {
         $scope.rootMyStudyList.page = page;
-        $scope.rootMyStudyList.userId = userInfo.userId;
-        listCourse($scope.rootMyStudyList, $http, function(list) {
-            list.forEach(function(c) {
-                var total = 0;
-                c.json.lessons.forEach(function(les) {
-                    if (les.ok) {
-                        total += 1;
-                    }
-                });
-                if (total > 0 && c.json.lessons.length > 0) {
-                    total = ((total / c.json.lessons.length) * 100).toFixed(0);
-                    c.json.progress = total;
+        listCourse($scope.rootMyStudyList, $http, function (list) {
+            list.forEach(function (c) {
+                if (c.json.totalLesson && c.json.totalLessonRight) {
+                    c.json.progress = ((c.json.totalLessonRight / c.json.totalLesson) * 100).toFixed(0);
                 }
             });
         });
     };
 
-    $scope.courseAction = function(c) {
-        getScope("CourseProgressControl").setCourse(c, true);
+    $scope.courseAction = function (c) {
+        getScope("CourseProgressControl").setCourse(c);
         mainView.router.load({pageName: "course_progress"});
     };
 });

@@ -9,6 +9,9 @@
             </div>
         </div>
     </div>
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="#" class="color-blue" style="font-size: 24px;" ng-if="canSync" ng-click="syncCourse()">Sync</a>
+    </div>
     <div class="list-block cards-list">
         <ul>
             <li class="card" ng-repeat-start="les in course.json.lessons"

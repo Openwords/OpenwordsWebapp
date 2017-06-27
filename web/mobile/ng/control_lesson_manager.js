@@ -1,4 +1,4 @@
-myNg.controller("LessonManagerControl", function($scope, $http, FileUploader) {
+myNg.controller("LessonManagerControl", function ($scope, $http, FileUploader) {
     var uploader = $scope.uploader = new FileUploader({
         url: "uploadLesson",
         queueLimit: 1
@@ -6,8 +6,8 @@ myNg.controller("LessonManagerControl", function($scope, $http, FileUploader) {
 
     var name;
 
-    $scope.doUpload = function() {
-        myApp.prompt("Please enter a name for the lesson", "Uploading Lesson", function(v) {
+    $scope.doUpload = function () {
+        myApp.prompt("Please enter a name for the lesson", "Uploading Lesson", function (v) {
             name = v;
             if (name) {
                 uploader.uploadAll();
@@ -18,16 +18,15 @@ myNg.controller("LessonManagerControl", function($scope, $http, FileUploader) {
         });
     };
 
-    uploader.onBeforeUploadItem = function(item) {
-        item.formData.push({userId: userInfo.userId});
+    uploader.onBeforeUploadItem = function (item) {
         item.formData.push({name: name});
     };
-    uploader.onSuccessItem = function(fileItem, response, status, headers) {
+    uploader.onSuccessItem = function (fileItem, response, status, headers) {
         uploader.clearQueue();
         myApp.alert(null, "Upload success");
         $scope.listMyLessons(1);
     };
-    uploader.onErrorItem = function(fileItem, response, status, headers) {
+    uploader.onErrorItem = function (fileItem, response, status, headers) {
         var m = "";
         if (status === 901) {
             m = "Lessons cannot have the same name";
@@ -35,9 +34,8 @@ myNg.controller("LessonManagerControl", function($scope, $http, FileUploader) {
         myApp.alert(m, "Upload fail");
     };
 
-    $scope.listMyLessons = function(page) {
+    $scope.listMyLessons = function (page) {
         $scope.rootMyLessonList.page = page;
-        $scope.rootMyLessonList.userId = userInfo.userId;
         listLesson($scope.rootMyLessonList, $http);
     };
 
@@ -45,12 +43,12 @@ myNg.controller("LessonManagerControl", function($scope, $http, FileUploader) {
     var actionButtons = [
         {
             text: "Preview",
-            onClick: function() {
+            onClick: function () {
                 STEPS = chosenLesson.json.steps;
                 var StepsControl = getScope("StepsControl");
                 StepsControl.lesson = chosenLesson;
                 StepsControl.mode = "preview";
-                $$("#back_button_in_steps").once("click", function() {
+                $$("#back_button_in_steps").once("click", function () {
                     stepOn = false;
                     mainView.router.load({pageName: "lesson_manager"});
                 });
@@ -60,16 +58,15 @@ myNg.controller("LessonManagerControl", function($scope, $http, FileUploader) {
         },
         {
             text: "Immediate Feedback Mode",
-            onClick: function() {
+            onClick: function () {
                 $http({
                     url: "changeLessonMode",
                     method: "get",
                     params: {
-                        userId: userInfo.userId,
                         name: chosenLesson.name,
                         imf: true
                     }
-                }).then(function(res) {
+                }).then(function (res) {
                     var r = res.data;
                     if (!r.errorMessage) {
                         chosenLesson.imf = true;
@@ -79,17 +76,16 @@ myNg.controller("LessonManagerControl", function($scope, $http, FileUploader) {
         },
         {
             text: "End Feedback Mode",
-            onClick: function() {
+            onClick: function () {
                 chosenLesson.imf = false;
                 $http({
                     url: "changeLessonMode",
                     method: "get",
                     params: {
-                        userId: userInfo.userId,
                         name: chosenLesson.name,
                         imf: false
                     }
-                }).then(function(res) {
+                }).then(function (res) {
                     var r = res.data;
                     if (!r.errorMessage) {
                         chosenLesson.imf = false;
@@ -100,18 +96,17 @@ myNg.controller("LessonManagerControl", function($scope, $http, FileUploader) {
         {
             text: "Delete",
             color: "red",
-            onClick: function() {
+            onClick: function () {
                 myApp.confirm("Are you sure to delete Lesson \"" + chosenLesson.name + "\"?",
                         "Deleting Lesson",
-                        function() {
+                        function () {
                             $http({
                                 url: "deleteLesson",
                                 method: "get",
                                 params: {
-                                    userId: userInfo.userId,
                                     name: chosenLesson.name
                                 }
-                            }).then(function(res) {
+                            }).then(function (res) {
                                 var r = res.data;
                                 if (!r.errorMessage) {
                                     $scope.listMyLessons(1);
@@ -127,7 +122,7 @@ myNg.controller("LessonManagerControl", function($scope, $http, FileUploader) {
         }
     ];
 
-    $scope.lessonAction = function(le) {
+    $scope.lessonAction = function (le) {
         chosenLesson = le;
         myApp.actions(actionButtons);
     };

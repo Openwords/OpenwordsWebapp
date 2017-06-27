@@ -1,11 +1,11 @@
-App.controller("RootControl", function($scope, $sce) {
+App.controller("RootControl", function ($scope, $sce) {
 
     $scope.lesson = [
         {
             pType: "fb",
             problemLines: [
                 {items: ["Today is Monday."], tags: []},
-                {items: ["@", "是", "@", "。"], tags: []}
+                {items: ["[]", "是", "[]", "。"], tags: []}
             ],
             answers: [
                 {items: ["今天", "今日"], tags: []},
@@ -19,7 +19,7 @@ App.controller("RootControl", function($scope, $sce) {
             pType: "fb",
             problemLines: [
                 {items: ["I am a cat."], tags: []},
-                {items: ["@", "@", "@", "@"], tags: []}
+                {items: ["[]", "[]", "[]", "[]"], tags: []}
             ],
             answers: [
                 {items: ["我"], tags: []},
@@ -34,7 +34,7 @@ App.controller("RootControl", function($scope, $sce) {
         {
             pType: "fb",
             problemLines: [
-                {items: ["Je", "@", "au travail."], tags: []}
+                {items: ["Je", "[]", "au travail."], tags: []}
             ],
             answers: [
                 {items: ["marche"], tags: []}
@@ -54,7 +54,7 @@ App.controller("RootControl", function($scope, $sce) {
         }
     ];
 
-    $scope.updateType = function(p) {
+    $scope.updateType = function (p) {
         if (p.pType === "sm") {
             p.problemLines = [{items: [], tags: [{text: ""}]}];
             p.answers = [{items: [], tags: [{text: ""}]}];
@@ -73,7 +73,7 @@ App.controller("RootControl", function($scope, $sce) {
         }
     };
 
-    $scope.addNextProblem = function() {
+    $scope.addNextProblem = function () {
         $scope.lesson.push({
             problemLines: [{items: [], tags: []}],
             answers: [],
@@ -83,11 +83,11 @@ App.controller("RootControl", function($scope, $sce) {
         });
     };
 
-    $scope.deleteProblem = function(index) {
+    $scope.deleteProblem = function (index) {
         $scope.lesson.splice(index, 1);
     };
 
-    $scope.showLastAdd = function(index) {
+    $scope.showLastAdd = function (index) {
         if (index === $scope.lesson.length - 1) {
             if ($scope.lesson[index].done) {
                 return true;
@@ -96,18 +96,18 @@ App.controller("RootControl", function($scope, $sce) {
         return false;
     };
 
-    $scope.addProblemLine = function(problemLines) {
+    $scope.addProblemLine = function (problemLines) {
         problemLines.push({
             items: [], tags: []
         });
     };
 
-    $scope.problemItemAdded = function(problem) {
+    $scope.problemItemAdded = function (problem) {
         problem.answers = [];
-        problem.problemLines.forEach(function(line) {
-            line.tags.forEach(function(tag, index) {
+        problem.problemLines.forEach(function (line) {
+            line.tags.forEach(function (tag, index) {
                 tag.id = index;
-                if (tag.text.indexOf("@") > -1) {
+                if (S(tag.text).contains("[]")) {
                     problem.answers.push({
                         items: [], tags: []
                     });
@@ -116,19 +116,19 @@ App.controller("RootControl", function($scope, $sce) {
         });
     };
 
-    $scope.sentenceItemAdded = function(tags) {
-        tags.forEach(function(tag, index) {
+    $scope.sentenceItemAdded = function (tags) {
+        tags.forEach(function (tag, index) {
             tag.id = index;
         });
     };
 
-    $scope.addBlankItem = function(problem, line) {
-        line.tags.push({text: "@", id: line.tags.length});
+    $scope.addBlankItem = function (problem, line) {
+        line.tags.push({text: "[]", id: line.tags.length});
 
         problem.answers = [];
-        problem.problemLines.forEach(function(line) {
-            line.tags.forEach(function(tag) {
-                if (tag.text.indexOf("@") > -1) {
+        problem.problemLines.forEach(function (line) {
+            line.tags.forEach(function (tag) {
+                if (S(tag.text).contains("[]")) {
                     problem.answers.push({
                         items: [], tags: []
                     });
@@ -137,13 +137,13 @@ App.controller("RootControl", function($scope, $sce) {
         });
     };
 
-    $scope.confirmProblem = function(problem) {
+    $scope.confirmProblem = function (problem) {
         if (problem.pType === "ss") {
             var tags = [];
             var answers = [];
             var i;
             for (i = 0; i < problem.answers[0].tags.length; i++) {
-                tags.push({text: "@", id: i});//make the blanks
+                tags.push({text: "[]", id: i});//make the blanks
                 answers.push({items: [], tags: [problem.answers[0].tags[i]]});//remake answers 
             }
 
@@ -151,36 +151,36 @@ App.controller("RootControl", function($scope, $sce) {
             problem.answers = answers;
         }
 
-        problem.problemLines.forEach(function(line) {
-            line.tags.forEach(function(tag) {
+        problem.problemLines.forEach(function (line) {
+            line.tags.forEach(function (tag) {
                 line.items.push(tag.text);
             });
         });
 
         problem.answerDisplay = [];
-        problem.answers.forEach(function(answer) {
-            answer.tags.forEach(function(tag) {
+        problem.answers.forEach(function (answer) {
+            answer.tags.forEach(function (tag) {
                 answer.items.push(tag.text);
                 problem.answerDisplay.push(tag.text);
             });
         });
 
-        problem.marplots.tags.forEach(function(tag) {
+        problem.marplots.tags.forEach(function (tag) {
             problem.marplots.items.push(tag.text);
             problem.answerDisplay.push(tag.text);
         });
 
         problem.done = true;
-        problem.answerDisplay.sort(function() {
+        problem.answerDisplay.sort(function () {
             return 0.5 - Math.random();
         });
     };
 
-    $scope.displayProblemLine = function(line) {
+    $scope.displayProblemLine = function (line) {
         var html = "";
         var totalBlank = 0;
-        line.items.forEach(function(item) {
-            if (S(item).contains("@")) {
+        line.items.forEach(function (item) {
+            if (S(item).contains("[]")) {
                 totalBlank += 1;
                 html += "<span class='form-inline'><input type='text' style='width: 50px; color: #000000;' class='form-control'/></span>";
             } else {
@@ -188,22 +188,21 @@ App.controller("RootControl", function($scope, $sce) {
             }
         });
         if (totalBlank === line.items.length) {
-            console.log("big blank");
             return $sce.trustAsHtml("<input type='text' style='width: 120px; color: #000000;' class='form-control'/>");
         }
         return $sce.trustAsHtml(html);
     };
 
-    $scope.downloadLesson = function() {
+    $scope.downloadLesson = function () {
         var out = "";
-        $scope.lesson.forEach(function(problem) {
+        $scope.lesson.forEach(function (problem) {
             out += "=" + problem.pType + "\r\n";
 
-            problem.problemLines.forEach(function(line) {
+            problem.problemLines.forEach(function (line) {
                 out += "*";
-                line.items.forEach(function(item) {
-                    if (item.indexOf("@") > -1) {
-                        out += "[@]";
+                line.items.forEach(function (item) {
+                    if (S(item).contains("[]")) {
+                        out += "[]";
                     } else {
                         out += "[" + item + "]";
                     }
@@ -211,16 +210,16 @@ App.controller("RootControl", function($scope, $sce) {
                 out += "\r\n";
             });
 
-            problem.answers.forEach(function(answer) {
+            problem.answers.forEach(function (answer) {
                 out += "#";
-                answer.items.forEach(function(item) {
+                answer.items.forEach(function (item) {
                     out += "[" + item + "]";
                 });
                 out += "\r\n";
             });
 
             out += "%";
-            problem.marplots.items.forEach(function(item) {
+            problem.marplots.items.forEach(function (item) {
                 out += "[" + item + "]";
             });
 

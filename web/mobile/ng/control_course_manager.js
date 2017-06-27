@@ -1,20 +1,19 @@
-myNg.controller("CourseManagerControl", function($scope, $http) {
+myNg.controller("CourseManagerControl", function ($scope, $http) {
 
-    $scope.createCourse = function() {
-        myApp.prompt("Please enter a name for the course", "Creating Course", function(v) {
+    $scope.createCourse = function () {
+        myApp.prompt("Please enter a name for the course", "Creating Course", function (v) {
             var name = v;
-            myApp.prompt("Please enter a simple description for the course", "Creating Course", function(v) {
+            myApp.prompt("Please enter a simple description for the course", "Creating Course", function (v) {
                 var comment = v;
                 $http({
                     url: "createCourse",
                     method: "get",
                     params: {
                         name: name,
-                        authorId: userInfo.userId,
                         userName: userInfo.username,
                         comment: comment
                     }
-                }).then(function(res) {
+                }).then(function (res) {
                     var r = res.data;
                     if (!r.errorMessage) {
                         myApp.alert(null, "Success");
@@ -27,9 +26,8 @@ myNg.controller("CourseManagerControl", function($scope, $http) {
         });
     };
 
-    $scope.listMyCourses = function(page) {
+    $scope.listMyCourses = function (page) {
         $scope.rootMyCourseList.page = page;
-        $scope.rootMyCourseList.authorId = userInfo.userId;
         listCourse($scope.rootMyCourseList, $http);
     };
 
@@ -37,31 +35,39 @@ myNg.controller("CourseManagerControl", function($scope, $http) {
     var actionButtons = [
         {
             text: "Edit",
-            onClick: function() {
-                var copy = JSON.parse(angular.toJson(chosenCourse));
-                $scope.rootTargetCourse.target = copy;
-                $scope.$apply();
-                mainView.router.load({pageName: "course_edit"});
-                getScope("CourseEditControl").courseContentChanged[0] = false;
+            onClick: function () {
+                $http({
+                    url: "getCourseLessons",
+                    method: "get",
+                    params: {
+                        makeTime: chosenCourse.makeTime
+                    }
+                }).then(function (res) {
+                    var r = res.data;
+                    if (!r.errorMessage) {
+                        var copy = JSON.parse(angular.toJson(chosenCourse));
+                        copy.json.lessons = r.result;
+                        $scope.rootTargetCourse.target = copy;
+                        mainView.router.load({pageName: "course_edit"});
+                        getScope("CourseEditControl").courseContentChanged[0] = false;
+                    }
+                });
             }
         },
         {
             text: "Delete",
             color: "red",
-            onClick: function() {
+            onClick: function () {
                 myApp.confirm("Are you sure to delete Course \"" + chosenCourse.name + "\"?",
                         "Deleting Course",
-                        function() {
+                        function () {
                             $http({
                                 url: "deleteCourse",
                                 method: "get",
                                 params: {
-                                    pass: "",
-                                    makeTime: chosenCourse.makeTime,
-                                    userId: chosenCourse.userId,
-                                    authorId: chosenCourse.authorId
+                                    makeTime: chosenCourse.makeTime
                                 }
-                            }).then(function(res) {
+                            }).then(function (res) {
                                 var r = res.data;
                                 if (!r.errorMessage) {
                                     $scope.listMyCourses(1);
@@ -77,8 +83,10 @@ myNg.controller("CourseManagerControl", function($scope, $http) {
         }
     ];
 
-    $scope.courseAction = function(c) {
+    $scope.courseAction = function (c) {
         chosenCourse = c;
         myApp.actions(actionButtons);
     };
 });
+
+

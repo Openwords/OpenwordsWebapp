@@ -24,11 +24,11 @@ function getScope(id) {
 
 var userInfo;
 
-myApp.onPageInit("course_list", function(page) {
+myApp.onPageInit("course_list", function (page) {
     console.log("course_list init");
 });
 
-myApp.onPageReinit("course_list", function(page) {
+myApp.onPageReinit("course_list", function (page) {
     console.log("course_list re");
     getScope("CourseListControl").listCourses(1);
 });
@@ -36,14 +36,15 @@ myApp.onPageReinit("course_list", function(page) {
 var STEPS;
 var stepsUI = null;
 var stepOn = false;
-myApp.onPageInit("steps", function(page) {
+var stepRe = true;
+myApp.onPageInit("steps", function (page) {
     console.log("steps init");
     stepsUI = myApp.swiper(".swiper-container", {
         pagination: ".swiper-pagination",
         grabCursor: true,
         spaceBetween: 80
     });
-    stepsUI.on("onSlideChangeEnd", function() {
+    stepsUI.on("onSlideChangeEnd", function () {
         var StepsControl = getScope("StepsControl");
         if (stepsUI.activeIndex === StepsControl.lesson.json.steps.length - 1) {
             if (StepsControl.lesson.json.steps[stepsUI.activeIndex].final) {
@@ -55,19 +56,18 @@ myApp.onPageInit("steps", function(page) {
 
     $$.ajax({
         url: "slide.html",
-        success: function(data) {
+        success: function (data) {
             buildStepPage(data);
         }
     });
 
-    $$(document).keydown(function(event) {
+    $$(document).keydown(function (event) {
         if (stepOn) {
-            if (event.keyCode === 37) {
+            if (event.key === "ArrowLeft") {
                 stepsUI.slidePrev();
-            } else if (event.keyCode === 39) {
+            } else if (event.key === "ArrowRight") {
                 stepsUI.slideNext();
             }
-            console.log("keydown");
         }
     });
 });
@@ -78,7 +78,7 @@ function buildStepPage(html) {
                 .replace("ng-init=\"init()\"", "ng-init=\"init(" + i + ")\""));
 
         var content = $$("#step_page_" + i);
-        angular.element(document.getElementById("StepsControl")).injector().invoke(function($compile) {
+        angular.element(document.getElementById("StepsControl")).injector().invoke(function ($compile) {
             var scope = angular.element(content).scope();
             $compile(content)(scope);
             scope.$apply();
@@ -86,18 +86,21 @@ function buildStepPage(html) {
     }
 }
 
-myApp.onPageReinit("steps", function(page) {
-    console.log("steps re");
+myApp.onPageReinit("steps", function (page) {
+    console.log("steps reinit:" + stepRe);
+    if (!stepRe) {
+        return;
+    }
     stepsUI.removeAllSlides();
     $$.ajax({
         url: "slide.html",
-        success: function(data) {
+        success: function (data) {
             buildStepPage(data);
         }
     });
 });
 
-myApp.onPageReinit("course_lessons", function(page) {
+myApp.onPageReinit("course_lessons", function (page) {
     console.log("course_lessons");
     var scope = getScope("LessonListControl");
 });

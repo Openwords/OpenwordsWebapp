@@ -1,7 +1,7 @@
-myNg.controller("CourseEditControl", function($scope, $http) {
+myNg.controller("CourseEditControl", function ($scope, $http) {
     $scope.courseContentChanged = [false];
 
-    $scope.addLesson = function() {
+    $scope.addLesson = function () {
         myApp.popup(".popup-choose-lesson");
         $scope.courseContentChanged[0] = true;
     };
@@ -11,7 +11,7 @@ myNg.controller("CourseEditControl", function($scope, $http) {
     var actionButtons = [
         {
             text: "Move up",
-            onClick: function() {
+            onClick: function () {
                 if (chosenLesson > 0) {
                     var les = lessonArray[chosenLesson];
                     var itemGoDown = lessonArray[chosenLesson - 1];
@@ -24,7 +24,7 @@ myNg.controller("CourseEditControl", function($scope, $http) {
         },
         {
             text: "Move down",
-            onClick: function() {
+            onClick: function () {
                 if (chosenLesson < lessonArray.length - 1) {
                     var les = lessonArray[chosenLesson];
                     var itemGoUp = lessonArray[chosenLesson + 1];
@@ -38,7 +38,7 @@ myNg.controller("CourseEditControl", function($scope, $http) {
         {
             text: "Remove",
             color: "red",
-            onClick: function() {
+            onClick: function () {
                 lessonArray.splice(chosenLesson, 1);
                 $scope.$apply();
                 $scope.courseContentChanged[0] = true;
@@ -49,7 +49,7 @@ myNg.controller("CourseEditControl", function($scope, $http) {
         }
     ];
 
-    $scope.lessonAction = function(index, array) {
+    $scope.lessonAction = function (index, array) {
         chosenLesson = index;
         lessonArray = array;
         myApp.actions(actionButtons);
