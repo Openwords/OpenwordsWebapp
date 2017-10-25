@@ -147,5 +147,7 @@
     "confirm": "确定",
     "button-lesson-comments": "读者评论",
     "title-comments-list": "评论列表",
-    "note-last-study": "最后一次学习"
+    "note-last-study": "最后一次学习",
+    "download": "下载",
+    "owml-preview": "OWML 预览"
 }

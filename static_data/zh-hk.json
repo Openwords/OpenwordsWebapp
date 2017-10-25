@@ -146,5 +146,7 @@
   "waiting-language": "正在讀取語言翻譯...",
   "confirm": "確定",
   "button-lesson-comments": "讀者評論",
-  "title-comments-list": "評論列表"
+  "title-comments-list": "評論列表",
+  "download": "下載",
+  "owml-preview": "OWML 預覽"
 }

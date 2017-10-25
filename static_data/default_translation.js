@@ -147,5 +147,7 @@ const en = {
     "confirm": "Confirm",
     "button-lesson-comments": "Comments from audience",
     "title-comments-list": "Comments",
-    "note-last-study": "Last studied"
+    "note-last-study": "Last studied",
+    "download": "Download",
+    "owml-preview": "OWML Preview"
 };

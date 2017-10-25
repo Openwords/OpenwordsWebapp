@@ -146,5 +146,7 @@
   "waiting-language": "言語翻訳をロード中...",
   "confirm": "確認",
   "button-lesson-comments": "聴衆からのコメント",
-  "title-comments-list": "コメント"
+  "title-comments-list": "コメント",
+  "download": "ダウンロード",
+  "owml-preview": "OWML プレビュー"
 }
