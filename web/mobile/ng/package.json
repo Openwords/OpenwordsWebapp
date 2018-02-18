@@ -1,6 +1,0 @@
-{
-    "name": "page_templates",
-    "scripts": {
-        "build": "rimraf dist/controls.js && uglifyjs *.js -o dist/controls.js"
-    }
-}

@@ -1,0 +1,1 @@
+rimraf dist/controls.js && uglifyjs *.js -o dist/controls.js

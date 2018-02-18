@@ -42,15 +42,6 @@ App.controller("RootControl", function ($scope, $sce) {
             marplots: {items: ["marchons", "marchent", "marchais"], tags: []},
             done: true,
             answerDisplay: ["marchons", "marche", "marchent", "marchais"]
-        },
-        {
-            problemLines: [
-                {items: [], tags: []}
-            ],
-            answers: [
-            ],
-            marplots: {items: [], tags: []},
-            done: false
         }
     ];
 
@@ -193,9 +184,9 @@ App.controller("RootControl", function ($scope, $sce) {
         return $sce.trustAsHtml(html);
     };
 
-    $scope.downloadLesson = function () {
+    function packLessonText(lesson) {
         var out = "";
-        $scope.lesson.forEach(function (problem) {
+        lesson.forEach(function (problem) {
             out += "=" + problem.pType + "\r\n";
 
             problem.problemLines.forEach(function (line) {
@@ -225,9 +216,59 @@ App.controller("RootControl", function ($scope, $sce) {
 
             out += "\r\n\r\n\r\n";
         });
+        return out;
+    }
 
-        var blob = new Blob([out], {type: "text/plain;charset=utf-8"});
+    $scope.downloadLesson = function () {
+        var blob = new Blob([packLessonText($scope.lesson)], {type: "text/plain;charset=utf-8"});
         saveAs(blob, "your_lesson.txt");
+    };
+
+    $scope.uploadLesson = function () {
+        if (!$scope.username) {
+            alert("Please provide your username");
+            return;
+        }
+        if (!$scope.password) {
+            alert("Please provide your password");
+            return;
+        }
+        if (!$scope.lessonName) {
+            alert("Please provide an unique name for this lesson");
+            return;
+        }
+        $.ajax({
+            url: "loginUser",
+            type: "GET",
+            data: {
+                username: $scope.username,
+                password: $scope.password
+            }
+        }).done(function (res) {
+            if (!res.errorMessage) {
+                var formData = new FormData();
+                formData.append("file", new Blob([packLessonText($scope.lesson)], {type: "text/plain;charset=utf-8"}));
+                formData.append("name", $scope.lessonName.trim());
+                $.ajax({
+                    url: "uploadLesson",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false
+                }).done(function () {
+                    alert("Upload success!");
+                    $scope.lessonName = null;
+                }).fail(function (res) {
+                    if (res.status === 901) {
+                        alert("Upload fail: Lessons cannot have the same name");
+                        return;
+                    }
+                    alert("Upload fail");
+                });
+            } else {
+                alert(res.errorMessage);
+            }
+        });
     };
 });
 

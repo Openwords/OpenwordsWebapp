@@ -1,0 +1,55 @@
+<template id="page_register">
+    <f7-page name="register" navbar-fixed>
+        <f7-navbar v-bind:title="$t('create-account')" v-bind:back-link="$t('back')" sliding></f7-navbar>
+        <f7-list form style="margin-top: 30%;">
+            <li class="item-content">
+                <div class="item-inner">
+                    <f7-input type="text" v-bind:placeholder="$t('create-username')" v-model="model.regUsername" v-on:input="myInput($v.model.regUsername)"></f7-input>
+                    <div class="item-after" v-show="$v.model.regUsername.$dirty">
+                        <span v-if="!$v.model.regUsername.required" class="badge bg-red">{{$t("create-name-error-1")}}</span>
+                        <div v-else>
+                            <span v-if="!$v.model.regUsername.minLength" class="badge bg-red">{{$t("create-name-error-2")}}</span>
+                            <span v-else class="badge bg-green">&#x2713;</span>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li class="item-content">
+                <div class="item-inner">
+                    <f7-input type="password" v-bind:placeholder="$t('password')" v-model="model.regPass" v-on:input="myInput($v.model.regPass)"></f7-input>
+                    <div class="item-after" v-show="$v.model.regPass.$dirty">
+                        <span v-if="!$v.model.regPass.required" class="badge bg-red">{{$t("create-pass-error-1")}}</span>
+                        <div v-else>
+                            <span v-if="!$v.model.regPass.minLength" class="badge bg-red">{{$t("create-pass-error-2")}}</span>
+                            <span v-else class="badge bg-green">&#x2713;</span>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li class="item-content">
+                <div class="item-inner">
+                    <f7-input type="password" v-bind:placeholder="$t('create-password')" v-model="model.regRepass" v-on:input="myInput($v.model.regRepass)"></f7-input>
+                    <div class="item-after" v-show="$v.model.regRepass.$dirty">
+                        <span v-if="!$v.model.regRepass.sameAsPassword" class="badge bg-red">{{$t("create-password2-error")}}</span>
+                        <span v-else class="badge bg-green">&#x2713;</span>
+                    </div>
+                </div>
+            </li>
+            <li class="item-content">
+                <div class="item-inner">
+                    <f7-input type="email" v-bind:placeholder="$t('create-email')" v-model="model.regEmail" v-on:input="myInput($v.model.regEmail)"></f7-input>
+                    <div class="item-after" v-show="$v.model.regEmail.$dirty">
+                        <span v-if="!$v.model.regEmail.required" class="badge bg-red">{{$t("create-email-error-1")}}</span>
+                        <div v-else>
+                            <span v-if="!$v.model.regEmail.email" class="badge bg-red">{{$t("create-email-error-2")}}</span>
+                            <span v-else class="badge bg-green">&#x2713;</span>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </f7-list>
+        <f7-block v-show="!$v.validationGroup.$invalid">
+            <f7-button v-on:click="submitOk">{{$t("submit")}}</f7-button>
+        </f7-block>
+    </f7-page>
+</template>

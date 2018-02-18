@@ -1,0 +1,715 @@
+<template id="comp_owml_preview">
+    <div class="popup popup-OWML-preview">
+        <f7-block-title style="text-align:center">{{$t("owml-preview")}}</f7-block-title>
+        <f7-block>
+            <f7-buttons>
+                <f7-button fill color="red" class="close-popup">{{$t("cancel")}}</f7-button>
+                <f7-button fill color="green" v-on:click="downloadOWML()">{{$t("download")}}</f7-button>
+            </f7-buttons>
+        </f7-block>
+        <f7-block>
+            <span style="white-space: pre-wrap;">{{owml}}</span>
+        </f7-block>
+    </div>
+</template>
+<template id="comp_sound_in">
+    <div>
+        <span v-if="!recording && !recordingDone && text.trim().length" v-on:click="startRecording()"
+              style="white-space: pre-wrap;">{{text}}</span>        
+        <img v-if="!recording && !recordingDone && !text.trim().length" src="img/icon_record.png"
+             style="height: 1em; vertical-align: middle;"
+             v-on:click="startRecording()"/>
+        <f7-link v-if="recording" v-on:click="stopRecording(true)" icon-f7="mic_fill"
+                 color="red" class="mic" v-bind:icon-size="myIconSize"
+                 style="margin-left: 6px; margin-right: 6px;"></f7-link>
+        <f7-link v-if="!recording && recordingDone" v-on:click="startRecording()" icon-f7="refresh_round_fill"
+                 v-bind:icon-size="myIconSize"
+                 style="margin-left: 3px; margin-right: 3px;"></f7-link>
+        <f7-link v-if="!recording && recordingDone" v-on:click="playRecording()" icon-f7="play_round_fill"
+                 v-bind:icon-size="myIconSize"
+                 style="margin-left: 3px; margin-right: 3px;"></f7-link>
+        <f7-link v-if="!recording && recordingDone" v-on:click="forfeitRecording()" icon-f7="trash_fill"
+                 v-bind:icon-size="myIconSize"
+                 style="margin-left: 3px; margin-right: 3px;"></f7-link>
+    </div>
+</template>
+<template id="dialog_search_courses">
+    <div>
+        <input type="text" style="width: 90%; border: 1px solid #03a9f4; font-size: 12pt; margin-top: 10px;"
+               id="search_course_name" />
+    </div>
+</template>
+
+<template id="page_course_edit">
+    <f7-page name="editCourse" navbar-fixed>
+        <f7-navbar sliding>
+            <f7-nav-left>
+                <a href="#" class="link" v-on:click="back()">
+                    <i class="icon icon-back"></i><span>{{$t("back")}}</span>
+                </a>
+            </f7-nav-left>
+            <f7-nav-center>{{$t("edit-course")}}</f7-nav-center>
+            <f7-nav-right><f7-link v-on:click="saveCourse()">{{$t("save")}}</f7-link></f7-nav-right>
+        </f7-navbar>
+        <f7-list class="inset">
+            <f7-list-item><f7-input type="text" placeholder="Name" v-model="course.name"/></f7-list-item>
+            <f7-list-item><f7-input type="text" placeholder="Description" v-if="course.json" v-model="course.json.comment"/></f7-list-item>
+        </f7-list>
+        <f7-block>
+            <a href="#" data-popop=".popup-choose-lesson" class="button button-fill color-green open-popup"
+               v-on:click="popupOpened()">{{$t("add-lesson")}}</a>
+        </f7-block>
+        <f7-block-title>{{$t("course-content")}}</f7-block-title>
+        <f7-list v-if="course.json">
+            <ul>
+                <li v-for="(le,index) in course.json.lessons">
+                    <a href="#" class="item-link item-content" v-on:click="courseLessonAction(index)">
+                        <div class="item-media">
+                            {{index + 1}}
+                        </div>
+                        <div class="item-inner">
+                            <div class="item-title">{{le.name}}</div>
+                            <div class="item-after">
+                                <span v-if="le.imf" class="badge" style="margin-right: 5px;">I</span>
+                                <span v-if="!le.imf" class="badge" style="margin-right: 5px;">E</span>
+                                <span class="badge">{{le.json.steps.length}}</span>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </f7-list>
+
+        <div class="popup popup-choose-lesson">
+            <f7-block-title>{{$t("choose-lesson")}}</f7-block-title>
+            <div class="list-block">
+                <ul>
+                    <li v-for="le in myLessons.list" v-bind:key="le.name">
+                        <a href="#" class="item-link item-content close-popup" v-on:click="addLessonFromPool(le)">
+                            <div class="item-inner">
+                                <div class="item-title">{{le.name}}</div>
+                                <div class="item-after">
+                                    <span class="badge">{{le.json.steps.length}}</span>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <f7-block v-if="!myLessons.list">
+                <p>{{$t("choose-lesson-message-1")}}<a href="#" class="close-popup" v-on:click="goToLessonManager()">{{$t("lessson-manage-title")}}</a>{{$t("choose-lesson-message-2")}}</p>
+            </f7-block>
+            <f7-block>
+                <p><a href="#" class="close-popup">{{$t("cancel")}}</a></p>
+            </f7-block>
+        </div>
+    </f7-page>
+</template>
+
+<template id="page_course_manager">
+    <f7-page name="courseManager" navbar-fixed>
+        <f7-navbar v-bind:back-link="$t('back')" sliding>
+            <f7-nav-center>{{$t("course-manage-title")}}</f7-nav-center>
+        </f7-navbar>
+        <f7-block>
+            <f7-grid>
+                <f7-col width="50">
+                    <f7-buttons>
+                        <f7-button class="button-fill color-green" v-on:click="createCourse()">{{$t("create-course")}}</f7-button>
+                    </f7-buttons>
+                </f7-col>
+                <f7-col width="50"></f7-col>
+            </f7-grid>
+        </f7-block>
+        <f7-block-title class="">{{$t("your-courses")}}</f7-block-title>
+        <f7-list media-list>
+            <ul>
+                <li v-for="(c, index) in myCourseList.list">
+                    <a href="#" class="item-link item-content" v-on:click="courseAction(c, index)">
+                        <div class="item-media"><img v-bind:src="c.fileCover" width="100"></div>
+                        <div class="item-inner">
+                            <div class="item-title-row">
+                                <div class="item-title">{{c.name}}</div>
+                                <div class="item-after">{{c.json.totalLesson}}</div>
+                            </div>
+                            <div class="item-text">{{c.json.comment}}</div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </f7-list>
+    </f7-page>
+</template>
+<template id="page_course_progress">
+    <f7-page name="courseProgress" navbar-fixed>
+        <f7-navbar v-bind:back-link="$t('back')" sliding></f7-navbar>
+        <div class="card demo-card-header-pic" style="margin: 0px;">
+            <div v-bind:style="'background-image:url(' + courseData.fileCover + ')'"
+                 valign="bottom" class="card-header color-white no-border my-lazy">
+                {{courseData.name}}
+            </div>
+            <div class="card-content">
+                <div class="card-content-inner">
+                    <p v-if="courseData.json">{{courseData.json.comment}}</p>
+                </div>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="#" class="color-blue" style="font-size: 24px;" v-if="canSync" v-on:click="syncCourse()">{{$t("sync")}}</a>
+        </div>
+        <div class="list-block cards-list" v-if="courseData.json">
+            <div v-for="(les,index) in courseData.json.lessons">
+                <div class="card" style="width: 100%; margin: 0px;">
+                    <a href="#" v-on:click="learnLesson(les)">
+                        <div class="card-content">
+                            <div class="card-content-inner" v-bind:class="{'lesson-done': les.ok}">
+                                <p>
+                                    <span style="margin-right: 20px; vertical-align: middle;">
+                                        <span>{{index + 1}}</span>
+                                    </span>
+                                    <span style="vertical-align: middle;">{{les.name}}</span>
+                                    <span v-if="les.imf" class="badge" style="margin-left: 5px;">I</span>
+                                    <span v-if="!les.imf" class="badge" style="margin-left: 5px;">E</span>
+                                    <span v-if="les.ok" style="float: right; font-size: 16pt; vertical-align: middle;">&#x2713;</span>
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div style="width: 3px; height: 40px; background-color: #007aff; margin-left: 20px;">
+                    &nbsp;
+                </div>
+            </div> 
+            <a href="#" class="color-red" v-on:click="forfeitCourse()">{{$t("forfeit")}}</a>
+        </div>
+    </f7-page>
+</template>
+<template id="page_home">
+    <f7-page name="home" navbar-fixed>
+        <f7-navbar>
+            <f7-nav-center>Openwords</f7-nav-center>
+            <f7-nav-right>
+                <f7-link icon="icon-bars" open-panel="right"></f7-link>
+            </f7-nav-right>
+            <f7-subnavbar>
+                <f7-buttons>
+                    <f7-button v-bind:active="parts[0]" v-on:click="showPart(0)">{{$t("courses")}}</f7-button>
+                    <f7-button v-bind:active="parts[1]" v-on:click="showPart(1)">{{$t("audience")}}</f7-button>
+                </f7-buttons>
+            </f7-subnavbar>
+        </f7-navbar>
+        <part-course-list v-if="parts[0]"></part-course-list>
+        <part-audience v-if="parts[1]"></part-audience>
+    </f7-page>
+</template>
+<template id="page_lesson_manager">
+    <f7-page name="lessonManager" navbar-fixed>
+        <f7-navbar v-bind:title="$t('lessson-manage-title')" v-bind:back-link="$t('back')" sliding></f7-navbar>
+        <f7-block-title>{{$t("upload-lesson")}}</f7-block-title>
+        <f7-block inset>
+            <f7-block inner>
+                <f7-block style="text-align: center; margin-bottom: 20px;">
+                    <a href="#" v-on:click="showSupport()"><i class="f7-icons">{{$t("info")}}</i></a>
+                </f7-block>
+                <f7-block action="uploadLesson" class="dropzone" id="my-upload">
+                    <f7-button class="dz-message">{{$t("select-txt")}}</f7-button>
+                </f7-block>                   
+                <f7-block v-show="buttonShow">
+                    <f7-buttons>
+                        <f7-button fill color="green" v-on:click="uploadFile()">{{$t("upload")}}</f7-button>
+                        <f7-button fill color="red" v-on:click="reset()">{{$t("cancel")}}</f7-button>
+                    </f7-buttons>
+                </f7-block>
+            </f7-block>
+        </f7-block>
+
+        <f7-block-title>{{$t("your-lessons")}}</f7-block-title>
+        <div class="list-block">
+            <ul>
+                <li v-for="(le, index) in myLesson.list" key="le.length">
+                    <a href="#" class="item-link item-content" v-on:click="lessonAction(le, index)">
+                        <div class="item-inner">
+                            <div class="item-title">{{le.name}}</div>
+                            <div class="item-after">
+                                <span class="badge">{{le.json.steps.length}}</span>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="popup popup-comments-list">
+            <f7-block-title>{{$t("title-comments-list")}}</f7-block-title>
+            <div class="list-block">
+                <ul>
+                    <li v-for="c in comments" style="padding-top: 5px; padding-bottom: 5px;">
+                        <div style="">{{c.json.comment}}</div>
+                        <div style="text-align: right;">
+                            <span class="badge">{{c.json.updated}}</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <f7-block>
+                <p><a href="#" class="close-popup">{{$t("ok")}}</a></p>
+            </f7-block>
+        </div>
+        <comp-owml-preview v-bind:owml="OWML"></comp-owml-preview>
+    </f7-page>
+</template>
+<template id="page_lesson_preview">
+    <f7-page name="lessonPreview" navbar-fixed>
+        <f7-navbar sliding>
+            <f7-nav-left>
+                <a href="#" class="link" v-on:click="back()">
+                    <i class="icon icon-back"></i><span>{{$t("back")}}</span>
+                </a>
+            </f7-nav-left>
+            <f7-nav-center>{{$t("lesson-preview")}}</f7-nav-center>
+            <f7-nav-right><f7-link v-on:click="save()">{{$t("save")}}</f7-link></f7-nav-right>
+        </f7-navbar>
+        <f7-swiper id="my-swiper-container" style="height: 100%;" pagination v-bind:params="myParams">
+            <f7-swiper-slide v-for="step in lesson.json.steps">
+                <div style="height: 50%; overflow-y: auto; padding: 20px;" >
+                    <div v-for="line in step.lines" style="margin-bottom: 10px;
+                         display: flex;
+                         align-items: center;
+                         flex-wrap: wrap;">
+                        <span v-for="item in line" style="font-size: 0px;">
+                            <span v-if="item.type === 'pro'" 
+                                  style="font-size: 16pt; display: inline-block;"
+                                  v-on:click="clickItemForSound(item)"
+                                  v-bind:class="{'pro-item-with-sound': hasSoundOut(item)[0],
+                                  'pro-item-with-sound-in': hasSoundIn(item)}">
+                                <span style="white-space: pre-wrap;">{{item.text}}</span>
+                            </span>
+                            <span v-if="item.type === 'ans'" class="button color-green"
+                                  style="display: inline-block; font-size: 16pt;">
+                                <span style="white-space: pre-wrap;">{{item.text}}</span>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="content-block inset" style="height: 50%;">
+                    <div class="content-block-inner swiper-no-swiping" 
+                         style="overflow-y: auto; overflow-x: auto; width: 100%; height: 50%;">
+                        <div v-for="line in step.lines" style="display: inline">
+                            <div v-for="a in line" v-if="a.type === 'ans' && a.text"
+                                 style="display: inline-block; white-space: nowrap; margin-right: 10px; font-size: 16pt; margin-bottom: 5px;"
+                                 class="button button-fill color-green">
+                                {{a.text}}
+                            </div>
+                            <div v-for="a in line" v-if="a.type === 'ans' && !a.text">
+                                <div v-for="it in a.items" style="display: inline-block; white-space: nowrap; margin-right: 10px; font-size: 16pt; margin-bottom: 5px;"
+                                     class="button button-fill color-green">
+                                    {{it.text}}
+                                </div>
+                            </div>
+                        </div>
+                        <div v-for="a in step.marplots" 
+                             style="display: inline-block; white-space: nowrap; margin-right: 10px; font-size: 16pt; margin-bottom: 5px;"
+                             class="button button-fill color-red">
+                            {{a.text}}
+                        </div>
+                    </div>
+                </div>
+
+            </f7-swiper-slide>
+        </f7-swiper>
+    </f7-page>
+</template>
+<template id="page_steps">
+    <f7-page name="steps" navbar-fixed>
+        <f7-navbar v-bind:back-link="$t('back')" sliding>
+            <f7-nav-center>
+                <f7-link v-if="onReady" v-on:click="backSeek()" icon-f7="rewind_round"></f7-link>
+                <a href="#" v-if="onReady && onPlay" v-on:click="pauseSound()"
+                   class="dark-blue-box">
+                    {{secondsDisplay}}
+                </a>
+                <a href="#" v-if="onReady && onPause" v-on:click="resumeSound()"
+                   class="light-blue-box">
+                    {{secondsDisplay}}
+                </a>
+                <f7-link v-if="onReady" v-on:click="forwardSeek()" icon-f7="fastforward_round"></f7-link>
+                <f7-link v-if="onReady" v-on:click="soundRate()" href="#" class="light-blue-box" style="margin-left: 10px;">
+                    x{{rate}}
+                </f7-link>
+            </f7-nav-center>
+            <f7-nav-right>
+                <f7-link v-if="reachFinal" v-on:click="goFinal()">{{$t("result")}}</f7-link>
+            </f7-nav-right>
+        </f7-navbar>
+        <f7-swiper id="my-swiper-container" style="height: 100%;" pagination v-bind:params="myParams">
+            <f7-swiper-slide v-for="(step, stepIndex) in lesson.json.steps" v-bind:key="step.id">
+                <!-- Problem section -->
+                <div style="height: 50%; overflow-y: auto; padding: 20px;">
+                    <div v-for="line in step.lines" style="margin-bottom: 10px; font-size: 0px;">
+                        <template v-for="item in line">
+                            <!-- Display white spaces, cannot wrap new lines -->
+                            <span v-if="item.type === 'pro' && !item.text.trim().length && !item.hasSoundOut && !item.hasSoundIn"
+                                  style="font-size: 16pt; white-space: pre; vertical-align: middle;">{{item.text}}</span>
+                            <!-- Display a sound image -->
+                            <div v-else-if="item.type === 'pro' && !item.text.trim().length && item.hasSoundOut && !item.hasSoundIn"
+                                 style="font-size: 16pt; vertical-align: middle; display: inline-block;"
+                                 v-on:click="clickItemForSound(item)">
+                                <img style="height: 1em; vertical-align: middle;"
+                                     src="img/icon_sound.png"/>
+                            </div>
+                            <!-- Display normal text with spaces, cannot display starting spaces -->
+                            <span v-else-if="item.type === 'pro' && !item.hasSoundIn"
+                                  style="font-size: 16pt; white-space: pre-wrap; vertical-align: middle; display: inline-block;"
+                                  v-on:click="clickItemForSound(item)"
+                                  v-bind:class="{'pro-item-with-sound': item.hasSoundOut}">{{item.text}}</span>
+                            <!-- Display a recording image/text -->
+                            <comp-sound-in v-if="item.type === 'pro' && item.hasSoundIn"
+                                           style="font-size: 16pt; vertical-align: middle; display: inline-block;"
+                                           v-bind:text="item.text"
+                                           v-bind:list="soundInList"
+                                           v-bind:my-icon-size="20"></comp-sound-in>
+                            <!-- Display an empty blank holder -->
+                            <a href="#"
+                               v-if="item.type === 'ans' && !item.userInput && !item.hasTypeIn" class="button color-green"
+                               style="font-size: 16pt; display: inline-block; vertical-align: middle;">&nbsp;&nbsp;&nbsp;&nbsp;</a>
+                            <!-- Display a type-in item -->
+                            <span v-if="item.type === 'ans' && item.hasTypeIn"
+                                  v-bind:class="{'input-item-border': !reachFinal || item.ok,
+                                  'input-item-border-wrong': (reachFinal && !item.ok) || (lesson.imf && !item.ok)}"
+                                  style="background-color: #ffffff; vertical-align: middle;"
+                                  class="swiper-no-swiping">
+                                <my-editable-span v-bind:text="item.userInput"
+                                                  v-on:type-in-done="typeInDone(stepIndex)"
+                                                  class="swiper-no-swiping"></my-editable-span>
+                            </span>
+                            <!-- Display choosen answer text -->
+                            <a href="#"
+                               v-if="item.userInput && !item.hasTypeIn" 
+                               v-bind:class="{'color-green': !reachFinal || item.ok,
+                               'color-red': (reachFinal && !item.ok) || (lesson.imf && !item.ok),
+                               'incorrect-choice': (reachFinal && !item.ok) || (lesson.imf && !item.ok)}"
+                               style="font-size: 16pt; white-space: pre-wrap; vertical-align: middle;"
+                               v-on:click="removeInput(item, stepIndex)">{{item.userInput.text}}</a>
+                        </template>
+                    </div>                    
+                </div>
+
+                <!-- Answer section -->
+                <div class="content-block inset" style="height: 50%;">
+                    <div class="content-block-inner swiper-no-swiping"
+                         v-if="!lesson.imf || (!step.check && lesson.imf)"
+                         style="overflow-x: auto; overflow-y: auto; width: 100%; height: 50%;">
+                        <span v-for="a in answerPool[stepIndex]">
+                            <a href="#" v-if="!a.typein || reachFinal"
+                               style="display: inline-block; white-space: nowrap; margin-right: 10px; font-size: 16pt;  margin-bottom: 5px;"
+                               class="button button-fill color-green"
+                               v-on:click="pickAnswer(a, stepIndex)">
+                                {{a.text}}
+                            </a>
+                        </span>
+                    </div>
+                    <div class="content-block-inner" 
+                         style="text-align: center;"
+                         v-if="step.check && lesson.imf">
+                        <span class="color-green" style="font-size: 36pt;">&#x2713;</span>
+                    </div>
+                </div>
+
+            </f7-swiper-slide>
+
+            <!-- Last page -->
+            <f7-swiper-slide>
+                <div class="content-block-title">{{$t("lesson-result")}}</div>
+                <div class="content-block">
+                    <div class="content-block-inner" style="font-size: 26pt;">
+                        <a href="#" v-for="(s, index) in lesson.json.steps"
+                           style="margin-right: 30px;"
+                           v-on:click="slideTo(index)">
+                            <span v-if="s.check" class="color-green">&#x2713;</span>
+                            <span v-if="!s.check" class="color-red">&#x2717;</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="content-block-title">{{$t("comment")}}</div>
+                <div class="list-block">
+                    <ul>
+                        <li class="align-top">
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-input">
+                                        <textarea v-model="lessonComment.text" 
+                                                  v-bind:placeholder="$t('comment-txt')"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="content-block row">
+                    <div class="col-20"></div>
+                    <a href="#" class="button button-fill" v-on:click="sendComment()"  v-bind:disabled="lessonComment.done">{{$t("submit-comment")}}</a>
+                    <div class="col-20"></div>
+                </div>
+                <div class="content-block row">
+                    <div class="col-20"></div>
+                    <a href="#" class="button button-fill color-orange" v-on:click="previewOWML()">{{$t("owml-preview")}}</a>
+                    <div class="col-20"></div>
+                </div>
+            </f7-swiper-slide>
+
+        </f7-swiper>
+        <comp-owml-preview v-bind:owml="owmlText"></comp-owml-preview>
+    </f7-page>
+</template>
+<template id="page_login">
+    <f7-page name="login" navbar-fixed>
+        <f7-navbar>
+            <f7-nav-center>Openwords (Beta)</f7-nav-center>
+        </f7-navbar>
+        <div class="popover popover-langs">
+            <div class="popover-angle"></div>
+            <div class="popover-inner">
+                <div class="list-block">
+                    <ul>
+                        <li v-for="lang in languages">
+                            <a href="#" v-on:click="languageChange(lang)" class="list-button item-link close-popover">{{lang.name}}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <f7-grid>
+            <f7-col width="10"></f7-col>
+            <f7-col width="80"><img src="img/openwords_logo_c_horizontal_squish_transparent_background_2016-06-04.png" style="width: 100%;"/></f7-col>
+            <f7-col width="10"></f7-col>
+        </f7-grid>
+        <f7-list form style="margin-top: 30%;">
+            <f7-list-item>
+                <f7-icon slot="media" f7="person" size="24px"></f7-icon>
+                <f7-input type="text" v-bind:placeholder="$t('username')" v-model="username"/>
+            </f7-list-item>
+            <f7-list-item>
+                <f7-icon slot="media" f7="lock" size="28px"></f7-icon>
+                <f7-input type="password" v-bind:placeholder="$t('password')" v-model="password"
+                          v-on:keyup.enter="doLogin()"/>
+            </f7-list-item>
+        </f7-list>
+        <f7-block>
+            <f7-grid>
+                <f7-col width="50"></f7-col>
+                <f7-col width="50"><f7-button v-on:click="doLogin()">{{ $t("login") }}</f7-button></f7-col>
+            </f7-grid>
+        </f7-block>
+        <f7-block>
+            <f7-grid>
+                <f7-col width="50"></f7-col>
+                <f7-col width="50"><f7-button v-on:click="doRegister()">{{ $t("register") }}</f7-button></f7-col>
+            </f7-grid>
+        </f7-block>
+        <div style="text-align: center; margin: 15px;"><a href="#" data-popover=".popover-langs" class="open-popover">{{currentLanguage.name}}</a></div>
+        <div style="text-align: center; color: #ffffff; font-size: 10px;">v1.0.22</div>
+    </f7-page>
+</template>
+<template id="page_register">
+    <f7-page name="register" navbar-fixed>
+        <f7-navbar v-bind:title="$t('create-account')" v-bind:back-link="$t('back')" sliding></f7-navbar>
+        <f7-list form style="margin-top: 30%;">
+            <li class="item-content">
+                <div class="item-inner">
+                    <f7-input type="text" v-bind:placeholder="$t('create-username')" v-model="model.regUsername" v-on:input="myInput($v.model.regUsername)"></f7-input>
+                    <div class="item-after" v-show="$v.model.regUsername.$dirty">
+                        <span v-if="!$v.model.regUsername.required" class="badge bg-red">{{$t("create-name-error-1")}}</span>
+                        <div v-else>
+                            <span v-if="!$v.model.regUsername.minLength" class="badge bg-red">{{$t("create-name-error-2")}}</span>
+                            <span v-else class="badge bg-green">&#x2713;</span>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li class="item-content">
+                <div class="item-inner">
+                    <f7-input type="password" v-bind:placeholder="$t('password')" v-model="model.regPass" v-on:input="myInput($v.model.regPass)"></f7-input>
+                    <div class="item-after" v-show="$v.model.regPass.$dirty">
+                        <span v-if="!$v.model.regPass.required" class="badge bg-red">{{$t("create-pass-error-1")}}</span>
+                        <div v-else>
+                            <span v-if="!$v.model.regPass.minLength" class="badge bg-red">{{$t("create-pass-error-2")}}</span>
+                            <span v-else class="badge bg-green">&#x2713;</span>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li class="item-content">
+                <div class="item-inner">
+                    <f7-input type="password" v-bind:placeholder="$t('create-password')" v-model="model.regRepass" v-on:input="myInput($v.model.regRepass)"></f7-input>
+                    <div class="item-after" v-show="$v.model.regRepass.$dirty">
+                        <span v-if="!$v.model.regRepass.sameAsPassword" class="badge bg-red">{{$t("create-password2-error")}}</span>
+                        <span v-else class="badge bg-green">&#x2713;</span>
+                    </div>
+                </div>
+            </li>
+            <li class="item-content">
+                <div class="item-inner">
+                    <f7-input type="email" v-bind:placeholder="$t('create-email')" v-model="model.regEmail" v-on:input="myInput($v.model.regEmail)"></f7-input>
+                    <div class="item-after" v-show="$v.model.regEmail.$dirty">
+                        <span v-if="!$v.model.regEmail.required" class="badge bg-red">{{$t("create-email-error-1")}}</span>
+                        <div v-else>
+                            <span v-if="!$v.model.regEmail.email" class="badge bg-red">{{$t("create-email-error-2")}}</span>
+                            <span v-else class="badge bg-green">&#x2713;</span>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </f7-list>
+        <f7-block v-show="!$v.validationGroup.$invalid">
+            <f7-button v-on:click="submitOk">{{$t("submit")}}</f7-button>
+        </f7-block>
+    </f7-page>
+</template>
+<template id="page_sound_manager">
+    <f7-page name="soundManager" navbar-fixed>
+        <f7-navbar v-bind:back-link="$t('back')" sliding></f7-navbar>
+        <f7-block-title>{{$t("item-text")}}</f7-block-title>
+        <f7-block inset inner>{{itemSound.item.text}}</f7-block>
+
+        <f7-block-title>{{$t("upload-sound-file")}}</f7-block-title>
+        <f7-block inset inner>
+            <f7-block action="uploadLesson" class="dropzone" id="sound-upload" v-show="!addFile">
+                <f7-button class="dz-message">{{$t("select-local-audio")}}</f7-button>
+            </f7-block>
+            <div v-if="addFile">
+                {{soundFileName}}
+            </div>
+            <f7-buttons v-if="addFile">
+                <f7-button fill color="red" v-on:click="cancelFile()">{{$t("cancel")}}</f7-button>
+                <f7-button fill color="green" v-on:click="playFile()">{{$t("play")}}</f7-button>
+                <f7-button fill color="blue" v-on:click="uploadSoundFile()">{{$t("upload")}}</f7-button>
+            </f7-buttons>
+        </f7-block>
+
+        <f7-block-title>{{$t("record-sound")}}</f7-block-title>
+        <f7-block inset inner>
+            <canvas id="visualizer" style="width: 100%; height: 80px;"></canvas>
+
+            <div class="row" id="sound_controls">
+            </div>
+
+            <f7-grid>
+                <f7-col width="50">
+                    <f7-button fill color="green"
+                               v-on:click="startRecording()"
+                               v-if="ok && !recording">{{$t("record")}}</f7-button>
+                </f7-col>
+                <f7-col width="50">
+                    <f7-button fill color="red"
+                               v-on:click="stopRecording(true)"
+                               v-if="ok && recording">{{$t("stop")}}</f7-button>
+                    <f7-button fill color="blue"
+                               v-on:click="uploadRecording()"
+                               v-if="canUpload">{{$t("upload")}}</f7-button>
+                </f7-col>
+            </f7-grid>
+        </f7-block>
+
+        <f7-block-title>{{$t("your-sounds")}}</f7-block-title>
+        <div class="list-block">
+            <ul>
+                <li v-for="(s, index) in soundList">
+                    <a href="#" class="item-link item-content" v-on:click="pickSound(s, index)">
+                        <div class="item-inner">
+                            <div class="item-title">{{s.text}}</div>
+                            <div class="item-after">
+                                <span class="badge" v-if="s.use">{{$t("use")}}</span>
+                                <span v-if="!s.use">{{s.dateString}}</span>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+    </f7-page>
+</template>
+<template id="page_study">
+    <f7-page name="study" navbar-fixed>
+        <f7-navbar sliding>
+            <f7-nav-left v-bind:back-link="$t('back')"></f7-nav-left>
+            <f7-nav-center>{{$t("progress")}}</f7-nav-center>
+        </f7-navbar>
+        <f7-block-title>{{$t("your-studys")}}</f7-block-title>
+        <div class="list-block media-list">
+            <ul>
+                <li v-for="(c, index) in myStudyList.list">
+                    <a href="#" class="item-link item-content" v-on:click="courseAction(c, index)">
+                        <div class="item-media"><img v-bind:src="c.fileCover" width="100"></div>
+                        <div class="item-inner">
+                            <div class="item-title-row">
+                                <div class="item-title">{{c.name}}</div>
+                                <div class="item-after" v-if="c.json.progress">{{c.json.progress}}%</div>
+                            </div>
+                            <div class="item-text">{{c.json.comment}}</div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </f7-page>
+</template>
+<template id="part_audience">
+    <div class="list-block cards-list" style="padding-top: 44px;">
+        <p style="text-align: center; font-size: 24px;" v-if="!stats.length">{{$t("audience-message")}}</p>
+        <ul v-if="stats.length">
+            <li class="card" v-for="s in stats" style="margin-bottom: 30px;">
+                <div class="card-header" style="background-color: #dae8f8;">
+                    {{s.json.display}}
+                </div>
+                <div class="card-content">
+                    <div class="card-content-inner" style="background-color: #eff6ff;">
+                        <f7-grid>
+                            <f7-col width="50">
+                                <img style="font-size: 18pt; height: 1em; vertical-align: middle;" src="img/icon_audience.png"/>
+                                <span style="vertical-align: middle;">{{s.json.totalLearner}}</span>
+                            </f7-col>
+                            <f7-col width="50">
+                                <img style="font-size: 18pt; height: 1em; vertical-align: middle;" src="img/icon_finish.png"/>
+                                <span style="vertical-align: middle;">{{s.json.finshed}} ({{s.per}}%)</span>
+                            </f7-col>
+                        </f7-grid>
+                        <div style="text-align: right; margin-top: 20px;">{{$t("note-last-study")}}: {{s.lastStudy}}</div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</template>
+<template id="part_course_list">
+    <div style="padding-top: 44px;">
+        <div class="list-block cards-list">
+            <ul>
+                <li v-on:click="learnCourse(c)" class="card demo-card-header-pic" v-for="c in allCourseList.showCourse">
+                    <div v-bind:data-src="c.fileCover"
+                         valign="bottom"
+                         class="card-header color-white no-border my-lazy"><span v-html="c.displayName"></span></div>
+                    <div class="card-content">
+                        <div class="card-content-inner">
+                            <p class="color-gray">{{$t("post-on")}} {{c.dateString}}</p>
+                            <p>{{c.json.comment}}</p>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="link">{{$t("learn")}}<span v-if="c.json.recent">&nbsp;{{$t("continue")}}</span></a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <f7-block style="text-align: center;">
+            <p v-if="allCourseList.courseNameSearch">
+                <a href="#" style="font-size: 16px; width: 100%;" class="color-blue" v-on:click="clearSearch()">{{$t("clear-search")}}</a>
+            </p>
+            <p v-if="allCourseList.canLookAfter">
+                <a href="#" style="font-size: 24px; width: 100%;" class="color-blue" v-on:click="showMore()">{{$t("more")}}</a>
+            </p>
+            <p style="font-size: 24px;" v-else>{{$t("end")}}</p>
+        </f7-block>
+    </div>
+</template>

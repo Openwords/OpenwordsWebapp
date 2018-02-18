@@ -1,0 +1,18 @@
+<template id="page_home">
+    <f7-page name="home" navbar-fixed>
+        <f7-navbar>
+            <f7-nav-center>Openwords</f7-nav-center>
+            <f7-nav-right>
+                <f7-link icon="icon-bars" open-panel="right"></f7-link>
+            </f7-nav-right>
+            <f7-subnavbar>
+                <f7-buttons>
+                    <f7-button v-bind:active="parts[0]" v-on:click="showPart(0)">{{$t("courses")}}</f7-button>
+                    <f7-button v-bind:active="parts[1]" v-on:click="showPart(1)">{{$t("audience")}}</f7-button>
+                </f7-buttons>
+            </f7-subnavbar>
+        </f7-navbar>
+        <part-course-list v-if="parts[0]"></part-course-list>
+        <part-audience v-if="parts[1]"></part-audience>
+    </f7-page>
+</template>

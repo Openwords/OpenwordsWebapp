@@ -1,0 +1,142 @@
+<template id="page_steps">
+    <f7-page name="steps" navbar-fixed>
+        <f7-navbar v-bind:back-link="$t('back')" sliding>
+            <f7-nav-center>
+                <f7-link v-if="onReady" v-on:click="backSeek()" icon-f7="rewind_round"></f7-link>
+                <a href="#" v-if="onReady && onPlay" v-on:click="pauseSound()"
+                   class="dark-blue-box">
+                    {{secondsDisplay}}
+                </a>
+                <a href="#" v-if="onReady && onPause" v-on:click="resumeSound()"
+                   class="light-blue-box">
+                    {{secondsDisplay}}
+                </a>
+                <f7-link v-if="onReady" v-on:click="forwardSeek()" icon-f7="fastforward_round"></f7-link>
+                <f7-link v-if="onReady" v-on:click="soundRate()" href="#" class="light-blue-box" style="margin-left: 10px;">
+                    x{{rate}}
+                </f7-link>
+            </f7-nav-center>
+            <f7-nav-right>
+                <f7-link v-if="reachFinal" v-on:click="goFinal()">{{$t("result")}}</f7-link>
+            </f7-nav-right>
+        </f7-navbar>
+        <f7-swiper id="my-swiper-container" style="height: 100%;" pagination v-bind:params="myParams">
+            <f7-swiper-slide v-for="(step, stepIndex) in lesson.json.steps" v-bind:key="step.id">
+                <!-- Problem section -->
+                <div style="height: 50%; overflow-y: auto; padding: 20px;">
+                    <div v-for="line in step.lines" style="margin-bottom: 10px; font-size: 0px;">
+                        <template v-for="item in line">
+                            <!-- Display white spaces, cannot wrap new lines -->
+                            <span v-if="item.type === 'pro' && !item.text.trim().length && !item.hasSoundOut && !item.hasSoundIn"
+                                  style="font-size: 16pt; white-space: pre; vertical-align: middle;">{{item.text}}</span>
+                            <!-- Display a sound image -->
+                            <div v-else-if="item.type === 'pro' && !item.text.trim().length && item.hasSoundOut && !item.hasSoundIn"
+                                 style="font-size: 16pt; vertical-align: middle; display: inline-block;"
+                                 v-on:click="clickItemForSound(item)">
+                                <img style="height: 1em; vertical-align: middle;"
+                                     src="img/icon_sound.png"/>
+                            </div>
+                            <!-- Display normal text with spaces, cannot display starting spaces -->
+                            <span v-else-if="item.type === 'pro' && !item.hasSoundIn"
+                                  style="font-size: 16pt; white-space: pre-wrap; vertical-align: middle; display: inline-block;"
+                                  v-on:click="clickItemForSound(item)"
+                                  v-bind:class="{'pro-item-with-sound': item.hasSoundOut}">{{item.text}}</span>
+                            <!-- Display a recording image/text -->
+                            <comp-sound-in v-if="item.type === 'pro' && item.hasSoundIn"
+                                           style="font-size: 16pt; vertical-align: middle; display: inline-block;"
+                                           v-bind:text="item.text"
+                                           v-bind:list="soundInList"
+                                           v-bind:my-icon-size="20"></comp-sound-in>
+                            <!-- Display an empty blank holder -->
+                            <a href="#"
+                               v-if="item.type === 'ans' && !item.userInput && !item.hasTypeIn" class="button color-green"
+                               style="font-size: 16pt; display: inline-block; vertical-align: middle;">&nbsp;&nbsp;&nbsp;&nbsp;</a>
+                            <!-- Display a type-in item -->
+                            <span v-if="item.type === 'ans' && item.hasTypeIn"
+                                  v-bind:class="{'input-item-border': !reachFinal || item.ok,
+                                  'input-item-border-wrong': (reachFinal && !item.ok) || (lesson.imf && !item.ok)}"
+                                  style="background-color: #ffffff; vertical-align: middle;"
+                                  class="swiper-no-swiping">
+                                <my-editable-span v-bind:text="item.userInput"
+                                                  v-on:type-in-done="typeInDone(stepIndex)"
+                                                  class="swiper-no-swiping"></my-editable-span>
+                            </span>
+                            <!-- Display choosen answer text -->
+                            <a href="#"
+                               v-if="item.userInput && !item.hasTypeIn" 
+                               v-bind:class="{'color-green': !reachFinal || item.ok,
+                               'color-red': (reachFinal && !item.ok) || (lesson.imf && !item.ok),
+                               'incorrect-choice': (reachFinal && !item.ok) || (lesson.imf && !item.ok)}"
+                               style="font-size: 16pt; white-space: pre-wrap; vertical-align: middle;"
+                               v-on:click="removeInput(item, stepIndex)">{{item.userInput.text}}</a>
+                        </template>
+                    </div>                    
+                </div>
+
+                <!-- Answer section -->
+                <div class="content-block inset" style="height: 50%;">
+                    <div class="content-block-inner swiper-no-swiping"
+                         v-if="!lesson.imf || (!step.check && lesson.imf)"
+                         style="overflow-x: auto; overflow-y: auto; width: 100%; height: 50%;">
+                        <span v-for="a in answerPool[stepIndex]">
+                            <a href="#" v-if="!a.typein || reachFinal"
+                               style="display: inline-block; white-space: nowrap; margin-right: 10px; font-size: 16pt;  margin-bottom: 5px;"
+                               class="button button-fill color-green"
+                               v-on:click="pickAnswer(a, stepIndex)">
+                                {{a.text}}
+                            </a>
+                        </span>
+                    </div>
+                    <div class="content-block-inner" 
+                         style="text-align: center;"
+                         v-if="step.check && lesson.imf">
+                        <span class="color-green" style="font-size: 36pt;">&#x2713;</span>
+                    </div>
+                </div>
+
+            </f7-swiper-slide>
+
+            <!-- Last page -->
+            <f7-swiper-slide>
+                <div class="content-block-title">{{$t("lesson-result")}}</div>
+                <div class="content-block">
+                    <div class="content-block-inner" style="font-size: 26pt;">
+                        <a href="#" v-for="(s, index) in lesson.json.steps"
+                           style="margin-right: 30px;"
+                           v-on:click="slideTo(index)">
+                            <span v-if="s.check" class="color-green">&#x2713;</span>
+                            <span v-if="!s.check" class="color-red">&#x2717;</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="content-block-title">{{$t("comment")}}</div>
+                <div class="list-block">
+                    <ul>
+                        <li class="align-top">
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-input">
+                                        <textarea v-model="lessonComment.text" 
+                                                  v-bind:placeholder="$t('comment-txt')"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="content-block row">
+                    <div class="col-20"></div>
+                    <a href="#" class="button button-fill" v-on:click="sendComment()"  v-bind:disabled="lessonComment.done">{{$t("submit-comment")}}</a>
+                    <div class="col-20"></div>
+                </div>
+                <div class="content-block row">
+                    <div class="col-20"></div>
+                    <a href="#" class="button button-fill color-orange" v-on:click="previewOWML()">{{$t("owml-preview")}}</a>
+                    <div class="col-20"></div>
+                </div>
+            </f7-swiper-slide>
+
+        </f7-swiper>
+        <comp-owml-preview v-bind:owml="owmlText"></comp-owml-preview>
+    </f7-page>
+</template>

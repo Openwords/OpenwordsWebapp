@@ -1,0 +1,34 @@
+<template id="page_course_manager">
+    <f7-page name="courseManager" navbar-fixed>
+        <f7-navbar v-bind:back-link="$t('back')" sliding>
+            <f7-nav-center>{{$t("course-manage-title")}}</f7-nav-center>
+        </f7-navbar>
+        <f7-block>
+            <f7-grid>
+                <f7-col width="50">
+                    <f7-buttons>
+                        <f7-button class="button-fill color-green" v-on:click="createCourse()">{{$t("create-course")}}</f7-button>
+                    </f7-buttons>
+                </f7-col>
+                <f7-col width="50"></f7-col>
+            </f7-grid>
+        </f7-block>
+        <f7-block-title class="">{{$t("your-courses")}}</f7-block-title>
+        <f7-list media-list>
+            <ul>
+                <li v-for="(c, index) in myCourseList.list">
+                    <a href="#" class="item-link item-content" v-on:click="courseAction(c, index)">
+                        <div class="item-media"><img v-bind:src="c.fileCover" width="100"></div>
+                        <div class="item-inner">
+                            <div class="item-title-row">
+                                <div class="item-title">{{c.name}}</div>
+                                <div class="item-after">{{c.json.totalLesson}}</div>
+                            </div>
+                            <div class="item-text">{{c.json.comment}}</div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </f7-list>
+    </f7-page>
+</template>

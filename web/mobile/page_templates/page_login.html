@@ -1,0 +1,49 @@
+<template id="page_login">
+    <f7-page name="login" navbar-fixed>
+        <f7-navbar>
+            <f7-nav-center>Openwords (Beta)</f7-nav-center>
+        </f7-navbar>
+        <div class="popover popover-langs">
+            <div class="popover-angle"></div>
+            <div class="popover-inner">
+                <div class="list-block">
+                    <ul>
+                        <li v-for="lang in languages">
+                            <a href="#" v-on:click="languageChange(lang)" class="list-button item-link close-popover">{{lang.name}}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <f7-grid>
+            <f7-col width="10"></f7-col>
+            <f7-col width="80"><img src="img/openwords_logo_c_horizontal_squish_transparent_background_2016-06-04.png" style="width: 100%;"/></f7-col>
+            <f7-col width="10"></f7-col>
+        </f7-grid>
+        <f7-list form style="margin-top: 30%;">
+            <f7-list-item>
+                <f7-icon slot="media" f7="person" size="24px"></f7-icon>
+                <f7-input type="text" v-bind:placeholder="$t('username')" v-model="username"/>
+            </f7-list-item>
+            <f7-list-item>
+                <f7-icon slot="media" f7="lock" size="28px"></f7-icon>
+                <f7-input type="password" v-bind:placeholder="$t('password')" v-model="password"
+                          v-on:keyup.enter="doLogin()"/>
+            </f7-list-item>
+        </f7-list>
+        <f7-block>
+            <f7-grid>
+                <f7-col width="50"></f7-col>
+                <f7-col width="50"><f7-button v-on:click="doLogin()">{{ $t("login") }}</f7-button></f7-col>
+            </f7-grid>
+        </f7-block>
+        <f7-block>
+            <f7-grid>
+                <f7-col width="50"></f7-col>
+                <f7-col width="50"><f7-button v-on:click="doRegister()">{{ $t("register") }}</f7-button></f7-col>
+            </f7-grid>
+        </f7-block>
+        <div style="text-align: center; margin: 15px;"><a href="#" data-popover=".popover-langs" class="open-popover">{{currentLanguage.name}}</a></div>
+        <div style="text-align: center; color: #ffffff; font-size: 10px;">v1.0.22</div>
+    </f7-page>
+</template>

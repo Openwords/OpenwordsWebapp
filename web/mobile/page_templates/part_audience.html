@@ -1,0 +1,27 @@
+<template id="part_audience">
+    <div class="list-block cards-list" style="padding-top: 44px;">
+        <p style="text-align: center; font-size: 24px;" v-if="!stats.length">{{$t("audience-message")}}</p>
+        <ul v-if="stats.length">
+            <li class="card" v-for="s in stats" style="margin-bottom: 30px;">
+                <div class="card-header" style="background-color: #dae8f8;">
+                    {{s.json.display}}
+                </div>
+                <div class="card-content">
+                    <div class="card-content-inner" style="background-color: #eff6ff;">
+                        <f7-grid>
+                            <f7-col width="50">
+                                <img style="font-size: 18pt; height: 1em; vertical-align: middle;" src="img/icon_audience.png"/>
+                                <span style="vertical-align: middle;">{{s.json.totalLearner}}</span>
+                            </f7-col>
+                            <f7-col width="50">
+                                <img style="font-size: 18pt; height: 1em; vertical-align: middle;" src="img/icon_finish.png"/>
+                                <span style="vertical-align: middle;">{{s.json.finshed}} ({{s.per}}%)</span>
+                            </f7-col>
+                        </f7-grid>
+                        <div style="text-align: right; margin-top: 20px;">{{$t("note-last-study")}}: {{s.lastStudy}}</div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</template>

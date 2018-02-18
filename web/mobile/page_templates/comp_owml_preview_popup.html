@@ -1,0 +1,14 @@
+<template id="comp_owml_preview">
+    <div class="popup popup-OWML-preview">
+        <f7-block-title style="text-align:center">{{$t("owml-preview")}}</f7-block-title>
+        <f7-block>
+            <f7-buttons>
+                <f7-button fill color="red" class="close-popup">{{$t("cancel")}}</f7-button>
+                <f7-button fill color="green" v-on:click="downloadOWML()">{{$t("download")}}</f7-button>
+            </f7-buttons>
+        </f7-block>
+        <f7-block>
+            <span style="white-space: pre-wrap;">{{owml}}</span>
+        </f7-block>
+    </div>
+</template>

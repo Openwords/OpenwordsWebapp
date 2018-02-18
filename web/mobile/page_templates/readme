@@ -1,0 +1,8 @@
+哈喽
+开发时可以onchange用来监控，从而实时"编译"
+onchange '*.html' -- npm run build
+
+需要提前安装三个东西
+npm install -g rimraf
+npm install -g concat-cli
+npm install -g onchange

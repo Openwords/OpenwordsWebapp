@@ -1,0 +1,65 @@
+<template id="page_course_edit">
+    <f7-page name="editCourse" navbar-fixed>
+        <f7-navbar sliding>
+            <f7-nav-left>
+                <a href="#" class="link" v-on:click="back()">
+                    <i class="icon icon-back"></i><span>{{$t("back")}}</span>
+                </a>
+            </f7-nav-left>
+            <f7-nav-center>{{$t("edit-course")}}</f7-nav-center>
+            <f7-nav-right><f7-link v-on:click="saveCourse()">{{$t("save")}}</f7-link></f7-nav-right>
+        </f7-navbar>
+        <f7-list class="inset">
+            <f7-list-item><f7-input type="text" placeholder="Name" v-model="course.name"/></f7-list-item>
+            <f7-list-item><f7-input type="text" placeholder="Description" v-if="course.json" v-model="course.json.comment"/></f7-list-item>
+        </f7-list>
+        <f7-block>
+            <a href="#" data-popop=".popup-choose-lesson" class="button button-fill color-green open-popup"
+               v-on:click="popupOpened()">{{$t("add-lesson")}}</a>
+        </f7-block>
+        <f7-block-title>{{$t("course-content")}}</f7-block-title>
+        <f7-list v-if="course.json">
+            <ul>
+                <li v-for="(le,index) in course.json.lessons">
+                    <a href="#" class="item-link item-content" v-on:click="courseLessonAction(index)">
+                        <div class="item-media">
+                            {{index + 1}}
+                        </div>
+                        <div class="item-inner">
+                            <div class="item-title">{{le.name}}</div>
+                            <div class="item-after">
+                                <span v-if="le.imf" class="badge" style="margin-right: 5px;">I</span>
+                                <span v-if="!le.imf" class="badge" style="margin-right: 5px;">E</span>
+                                <span class="badge">{{le.json.steps.length}}</span>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </f7-list>
+
+        <div class="popup popup-choose-lesson">
+            <f7-block-title>{{$t("choose-lesson")}}</f7-block-title>
+            <div class="list-block">
+                <ul>
+                    <li v-for="le in myLessons.list" v-bind:key="le.name">
+                        <a href="#" class="item-link item-content close-popup" v-on:click="addLessonFromPool(le)">
+                            <div class="item-inner">
+                                <div class="item-title">{{le.name}}</div>
+                                <div class="item-after">
+                                    <span class="badge">{{le.json.steps.length}}</span>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <f7-block v-if="!myLessons.list">
+                <p>{{$t("choose-lesson-message-1")}}<a href="#" class="close-popup" v-on:click="goToLessonManager()">{{$t("lessson-manage-title")}}</a>{{$t("choose-lesson-message-2")}}</p>
+            </f7-block>
+            <f7-block>
+                <p><a href="#" class="close-popup">{{$t("cancel")}}</a></p>
+            </f7-block>
+        </div>
+    </f7-page>
+</template>

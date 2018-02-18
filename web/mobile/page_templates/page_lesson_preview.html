@@ -1,0 +1,62 @@
+<template id="page_lesson_preview">
+    <f7-page name="lessonPreview" navbar-fixed>
+        <f7-navbar sliding>
+            <f7-nav-left>
+                <a href="#" class="link" v-on:click="back()">
+                    <i class="icon icon-back"></i><span>{{$t("back")}}</span>
+                </a>
+            </f7-nav-left>
+            <f7-nav-center>{{$t("lesson-preview")}}</f7-nav-center>
+            <f7-nav-right><f7-link v-on:click="save()">{{$t("save")}}</f7-link></f7-nav-right>
+        </f7-navbar>
+        <f7-swiper id="my-swiper-container" style="height: 100%;" pagination v-bind:params="myParams">
+            <f7-swiper-slide v-for="step in lesson.json.steps">
+                <div style="height: 50%; overflow-y: auto; padding: 20px;" >
+                    <div v-for="line in step.lines" style="margin-bottom: 10px;
+                         display: flex;
+                         align-items: center;
+                         flex-wrap: wrap;">
+                        <span v-for="item in line" style="font-size: 0px;">
+                            <span v-if="item.type === 'pro'" 
+                                  style="font-size: 16pt; display: inline-block;"
+                                  v-on:click="clickItemForSound(item)"
+                                  v-bind:class="{'pro-item-with-sound': hasSoundOut(item)[0],
+                                  'pro-item-with-sound-in': hasSoundIn(item)}">
+                                <span style="white-space: pre-wrap;">{{item.text}}</span>
+                            </span>
+                            <span v-if="item.type === 'ans'" class="button color-green"
+                                  style="display: inline-block; font-size: 16pt;">
+                                <span style="white-space: pre-wrap;">{{item.text}}</span>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="content-block inset" style="height: 50%;">
+                    <div class="content-block-inner swiper-no-swiping" 
+                         style="overflow-y: auto; overflow-x: auto; width: 100%; height: 50%;">
+                        <div v-for="line in step.lines" style="display: inline">
+                            <div v-for="a in line" v-if="a.type === 'ans' && a.text"
+                                 style="display: inline-block; white-space: nowrap; margin-right: 10px; font-size: 16pt; margin-bottom: 5px;"
+                                 class="button button-fill color-green">
+                                {{a.text}}
+                            </div>
+                            <div v-for="a in line" v-if="a.type === 'ans' && !a.text">
+                                <div v-for="it in a.items" style="display: inline-block; white-space: nowrap; margin-right: 10px; font-size: 16pt; margin-bottom: 5px;"
+                                     class="button button-fill color-green">
+                                    {{it.text}}
+                                </div>
+                            </div>
+                        </div>
+                        <div v-for="a in step.marplots" 
+                             style="display: inline-block; white-space: nowrap; margin-right: 10px; font-size: 16pt; margin-bottom: 5px;"
+                             class="button button-fill color-red">
+                            {{a.text}}
+                        </div>
+                    </div>
+                </div>
+
+            </f7-swiper-slide>
+        </f7-swiper>
+    </f7-page>
+</template>

@@ -1,0 +1,31 @@
+<template id="part_course_list">
+    <div style="padding-top: 44px;">
+        <div class="list-block cards-list">
+            <ul>
+                <li v-on:click="learnCourse(c)" class="card demo-card-header-pic" v-for="c in allCourseList.showCourse">
+                    <div v-bind:data-src="c.fileCover"
+                         valign="bottom"
+                         class="card-header color-white no-border my-lazy"><span v-html="c.displayName"></span></div>
+                    <div class="card-content">
+                        <div class="card-content-inner">
+                            <p class="color-gray">{{$t("post-on")}} {{c.dateString}}</p>
+                            <p>{{c.json.comment}}</p>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="link">{{$t("learn")}}<span v-if="c.json.recent">&nbsp;{{$t("continue")}}</span></a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <f7-block style="text-align: center;">
+            <p v-if="allCourseList.courseNameSearch">
+                <a href="#" style="font-size: 16px; width: 100%;" class="color-blue" v-on:click="clearSearch()">{{$t("clear-search")}}</a>
+            </p>
+            <p v-if="allCourseList.canLookAfter">
+                <a href="#" style="font-size: 24px; width: 100%;" class="color-blue" v-on:click="showMore()">{{$t("more")}}</a>
+            </p>
+            <p style="font-size: 24px;" v-else>{{$t("end")}}</p>
+        </f7-block>
+    </div>
+</template>

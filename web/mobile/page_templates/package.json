@@ -1,0 +1,6 @@
+{
+    "name": "page_templates",
+    "scripts": {
+        "build": "rimraf all.html && concat-cli -f *.html -o ../all.html"
+    }
+}

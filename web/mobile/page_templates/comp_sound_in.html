@@ -1,0 +1,21 @@
+<template id="comp_sound_in">
+    <div>
+        <span v-if="!recording && !recordingDone && text.trim().length" v-on:click="startRecording()"
+              style="white-space: pre-wrap;">{{text}}</span>        
+        <img v-if="!recording && !recordingDone && !text.trim().length" src="img/icon_record.png"
+             style="height: 1em; vertical-align: middle;"
+             v-on:click="startRecording()"/>
+        <f7-link v-if="recording" v-on:click="stopRecording(true)" icon-f7="mic_fill"
+                 color="red" class="mic" v-bind:icon-size="myIconSize"
+                 style="margin-left: 6px; margin-right: 6px;"></f7-link>
+        <f7-link v-if="!recording && recordingDone" v-on:click="startRecording()" icon-f7="refresh_round_fill"
+                 v-bind:icon-size="myIconSize"
+                 style="margin-left: 3px; margin-right: 3px;"></f7-link>
+        <f7-link v-if="!recording && recordingDone" v-on:click="playRecording()" icon-f7="play_round_fill"
+                 v-bind:icon-size="myIconSize"
+                 style="margin-left: 3px; margin-right: 3px;"></f7-link>
+        <f7-link v-if="!recording && recordingDone" v-on:click="forfeitRecording()" icon-f7="trash_fill"
+                 v-bind:icon-size="myIconSize"
+                 style="margin-left: 3px; margin-right: 3px;"></f7-link>
+    </div>
+</template>

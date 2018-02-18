@@ -1,0 +1,44 @@
+<template id="page_course_progress">
+    <f7-page name="courseProgress" navbar-fixed>
+        <f7-navbar v-bind:back-link="$t('back')" sliding></f7-navbar>
+        <div class="card demo-card-header-pic" style="margin: 0px;">
+            <div v-bind:style="'background-image:url(' + courseData.fileCover + ')'"
+                 valign="bottom" class="card-header color-white no-border my-lazy">
+                {{courseData.name}}
+            </div>
+            <div class="card-content">
+                <div class="card-content-inner">
+                    <p v-if="courseData.json">{{courseData.json.comment}}</p>
+                </div>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="#" class="color-blue" style="font-size: 24px;" v-if="canSync" v-on:click="syncCourse()">{{$t("sync")}}</a>
+        </div>
+        <div class="list-block cards-list" v-if="courseData.json">
+            <div v-for="(les,index) in courseData.json.lessons">
+                <div class="card" style="width: 100%; margin: 0px;">
+                    <a href="#" v-on:click="learnLesson(les)">
+                        <div class="card-content">
+                            <div class="card-content-inner" v-bind:class="{'lesson-done': les.ok}">
+                                <p>
+                                    <span style="margin-right: 20px; vertical-align: middle;">
+                                        <span>{{index + 1}}</span>
+                                    </span>
+                                    <span style="vertical-align: middle;">{{les.name}}</span>
+                                    <span v-if="les.imf" class="badge" style="margin-left: 5px;">I</span>
+                                    <span v-if="!les.imf" class="badge" style="margin-left: 5px;">E</span>
+                                    <span v-if="les.ok" style="float: right; font-size: 16pt; vertical-align: middle;">&#x2713;</span>
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div style="width: 3px; height: 40px; background-color: #007aff; margin-left: 20px;">
+                    &nbsp;
+                </div>
+            </div> 
+            <a href="#" class="color-red" v-on:click="forfeitCourse()">{{$t("forfeit")}}</a>
+        </div>
+    </f7-page>
+</template>

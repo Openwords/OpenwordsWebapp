@@ -1,0 +1,56 @@
+<template id="page_lesson_manager">
+    <f7-page name="lessonManager" navbar-fixed>
+        <f7-navbar v-bind:title="$t('lessson-manage-title')" v-bind:back-link="$t('back')" sliding></f7-navbar>
+        <f7-block-title>{{$t("upload-lesson")}}</f7-block-title>
+        <f7-block inset>
+            <f7-block inner>
+                <f7-block style="text-align: center; margin-bottom: 20px;">
+                    <a href="#" v-on:click="showSupport()"><i class="f7-icons">{{$t("info")}}</i></a>
+                </f7-block>
+                <f7-block action="uploadLesson" class="dropzone" id="my-upload">
+                    <f7-button class="dz-message">{{$t("select-txt")}}</f7-button>
+                </f7-block>                   
+                <f7-block v-show="buttonShow">
+                    <f7-buttons>
+                        <f7-button fill color="green" v-on:click="uploadFile()">{{$t("upload")}}</f7-button>
+                        <f7-button fill color="red" v-on:click="reset()">{{$t("cancel")}}</f7-button>
+                    </f7-buttons>
+                </f7-block>
+            </f7-block>
+        </f7-block>
+
+        <f7-block-title>{{$t("your-lessons")}}</f7-block-title>
+        <div class="list-block">
+            <ul>
+                <li v-for="(le, index) in myLesson.list" key="le.length">
+                    <a href="#" class="item-link item-content" v-on:click="lessonAction(le, index)">
+                        <div class="item-inner">
+                            <div class="item-title">{{le.name}}</div>
+                            <div class="item-after">
+                                <span class="badge">{{le.json.steps.length}}</span>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="popup popup-comments-list">
+            <f7-block-title>{{$t("title-comments-list")}}</f7-block-title>
+            <div class="list-block">
+                <ul>
+                    <li v-for="c in comments" style="padding-top: 5px; padding-bottom: 5px;">
+                        <div style="">{{c.json.comment}}</div>
+                        <div style="text-align: right;">
+                            <span class="badge">{{c.json.updated}}</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <f7-block>
+                <p><a href="#" class="close-popup">{{$t("ok")}}</a></p>
+            </f7-block>
+        </div>
+        <comp-owml-preview v-bind:owml="OWML"></comp-owml-preview>
+    </f7-page>
+</template>

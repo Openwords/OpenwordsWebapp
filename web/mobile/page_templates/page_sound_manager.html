@@ -1,0 +1,64 @@
+<template id="page_sound_manager">
+    <f7-page name="soundManager" navbar-fixed>
+        <f7-navbar v-bind:back-link="$t('back')" sliding></f7-navbar>
+        <f7-block-title>{{$t("item-text")}}</f7-block-title>
+        <f7-block inset inner>{{itemSound.item.text}}</f7-block>
+
+        <f7-block-title>{{$t("upload-sound-file")}}</f7-block-title>
+        <f7-block inset inner>
+            <f7-block action="uploadLesson" class="dropzone" id="sound-upload" v-show="!addFile">
+                <f7-button class="dz-message">{{$t("select-local-audio")}}</f7-button>
+            </f7-block>
+            <div v-if="addFile">
+                {{soundFileName}}
+            </div>
+            <f7-buttons v-if="addFile">
+                <f7-button fill color="red" v-on:click="cancelFile()">{{$t("cancel")}}</f7-button>
+                <f7-button fill color="green" v-on:click="playFile()">{{$t("play")}}</f7-button>
+                <f7-button fill color="blue" v-on:click="uploadSoundFile()">{{$t("upload")}}</f7-button>
+            </f7-buttons>
+        </f7-block>
+
+        <f7-block-title>{{$t("record-sound")}}</f7-block-title>
+        <f7-block inset inner>
+            <canvas id="visualizer" style="width: 100%; height: 80px;"></canvas>
+
+            <div class="row" id="sound_controls">
+            </div>
+
+            <f7-grid>
+                <f7-col width="50">
+                    <f7-button fill color="green"
+                               v-on:click="startRecording()"
+                               v-if="ok && !recording">{{$t("record")}}</f7-button>
+                </f7-col>
+                <f7-col width="50">
+                    <f7-button fill color="red"
+                               v-on:click="stopRecording(true)"
+                               v-if="ok && recording">{{$t("stop")}}</f7-button>
+                    <f7-button fill color="blue"
+                               v-on:click="uploadRecording()"
+                               v-if="canUpload">{{$t("upload")}}</f7-button>
+                </f7-col>
+            </f7-grid>
+        </f7-block>
+
+        <f7-block-title>{{$t("your-sounds")}}</f7-block-title>
+        <div class="list-block">
+            <ul>
+                <li v-for="(s, index) in soundList">
+                    <a href="#" class="item-link item-content" v-on:click="pickSound(s, index)">
+                        <div class="item-inner">
+                            <div class="item-title">{{s.text}}</div>
+                            <div class="item-after">
+                                <span class="badge" v-if="s.use">{{$t("use")}}</span>
+                                <span v-if="!s.use">{{s.dateString}}</span>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+    </f7-page>
+</template>

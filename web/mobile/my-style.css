@@ -1,0 +1,80 @@
+.demo-card-header-pic .card-header {
+    height: 35vw;
+    background-size: cover;
+    background-position: center;
+}
+
+.my-lazy{
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+
+.lesson-done{
+    background-color: #dddddd;
+}
+
+.incorrect-choice{
+    text-decoration: underline wavy #ff3b30;
+}
+
+.pro-item-with-sound{
+    color: #03a9f4;
+    border: 1px solid #03a9f4;
+    border-radius: 6px;
+}
+
+.pro-item-with-sound-in{
+    color: #8A2BE2;
+    border: 1px solid #8A2BE2;
+}
+
+.input-item-border{
+    border: 1px solid #4cd964;
+    border-radius: 4px;
+    font-size: 16pt;
+}
+
+.input-item-border-wrong{
+    border: 1px solid #ff3b30;
+    border-radius: 4px;
+    font-size: 16pt;
+}
+
+.course-name-highlight{
+    background-color: #ec971f;
+}
+
+.light-blue-box{
+    color: #007aff;
+    border: 1px solid #007aff;
+    border-radius: 8px;
+    line-height: 1em !important;
+    height: 1em !important;
+    padding: 3px;
+}
+
+.dark-blue-box{
+    background-color: #007aff;
+    color: #ffffff;
+    border: 1px solid #007aff;
+    border-radius: 8px;
+    line-height: 1em !important;
+    height: 1em !important;
+    padding: 3px;
+}
+
+.screen{
+    width: 60%;
+    margin: 0 auto;
+    box-shadow: #d1d1d1 0px 0px 10px;
+    border-left: 1px solid  #c1c1c1;
+    border-right: 1px solid  #c1c1c1;
+}
+
+.mic{
+    animation: mic 0.8s ease infinite;
+}
+
+@keyframes mic {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
