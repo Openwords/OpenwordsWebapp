@@ -1,0 +1,12 @@
+{
+  "name": "Openwords",
+  "version": "1.0.22",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "Shenshen Han",
+  "devDependencies": {
+    "electron": "^2.0.0"
+  }
+}

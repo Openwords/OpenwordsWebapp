@@ -6,6 +6,10 @@
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black">
         <title>Openwords</title>
+        <script>if (typeof module === 'object') {
+                window.module = module;
+                module = undefined;
+            }</script>
         <link rel="stylesheet" href="libs/f7/css/framework7.ios.min.css">
         <link rel="stylesheet" href="libs/f7/css/framework7.ios.colors.min.css">
         <link rel="stylesheet" href="libs/framework7-icons/css/framework7-icons.css">
@@ -14,7 +18,7 @@
         <script type="text/javascript" src="libs/f7/js/framework7.min.js"></script>
         <script type="text/javascript" src="libs/dist/libs.js"></script>
         <script>
-            const ServerAddress = "";
+            const ServerAddress = "https://rose-openwords.b9ad.pro-us-east-1.openshiftapps.com/";
         </script>
         <!--        <script type="text/javascript" src="libs/vuex.min.js"></script>
                 <script type="text/javascript" src="libs/framework7-vue.min.js"></script>
@@ -91,5 +95,7 @@
                 <script type="text/javascript" src="controls/comp_owml_preview.js"></script>-->
         <script type="text/javascript" src="controls/dist/controls.js"></script>
         <script type="text/javascript" src="app.js"></script>
+        <script>if (window.module)
+                module = window.module;</script>
     </body>
 </html>
