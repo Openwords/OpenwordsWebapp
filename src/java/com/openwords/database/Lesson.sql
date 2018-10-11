@@ -4,7 +4,8 @@ CREATE TABLE `lessons` (
   `language_one` varchar(10) NOT NULL,
   `language_two` varchar(10) NOT NULL,
   `updated_time` bigint NOT NULL,
-  `content` text COLLATE utf8_unicode_ci NOT NULL
+  `content` text COLLATE utf8_unicode_ci NOT NULL,
+  `imf` tinyint(1) NOT NULL,
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 ALTER TABLE `lessons`
